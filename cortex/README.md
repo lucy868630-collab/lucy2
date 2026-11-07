@@ -167,12 +167,13 @@ catch { $_.Exception.Response.StatusCode.value__ }
 Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态托管。推荐 Vercel（Next.js 官方平台，免费额度够原型用）：
 
 1. 先把代码推到 GitHub 并确认 **Actions 全绿**（见上节）
-2. https://vercel.com → Add New → Project → Import 仓库
-3. **Root Directory 选 `cortex`**。`cortex/vercel.json` 已固定 `framework: nextjs`、`npm ci`、`npm run build`，其余保持默认；Region 建议选 Sydney（`syd1`），离新西兰更近
-4. Environment Variables 填入 `.env.example` 里的 4 个变量（**在 Vercel 控制台填，不要写进代码**）
-5. Deploy → 得到 `https://<项目>.vercel.app`，全世界可访问
-6. Supabase → Authentication → URL Configuration：Site URL 改成该域名，Redirect URLs 加上 `https://<项目>.vercel.app/dashboard`
-7. 用真实浏览器走一遍「注册 → 上传 → AI 报告」，确认线上环境变量生效
+2. 直接打开 **https://vercel.com/new**（新版 UI 的按钮叫右上角 `New Project`，不叫 "Add New → Project"）→ 在仓库列表选 `lucy2`；若列表里没有，用 **Import third-party Git repository** 直接贴仓库 URL
+3. **Root Directory 填 `cortex`**：它在配置页 Framework Preset 附近，点 `Edit` 修改。`cortex/vercel.json` 已固定 `framework: nextjs`、`npm ci`、`npm run build`，其余保持默认
+4. Environment Variables 在**同一个配置页往下滚**的折叠区，填入 `.env.example` 里的 4 个变量（**在 Vercel 控制台填，不要写进代码**）
+5. Region 不在导入流程里（部署后到 Settings → Functions 才能调，Hobby 计划可能不支持），先跳过，不影响上线
+6. Deploy → 得到 `https://<项目>.vercel.app`，全世界可访问
+7. Supabase → Authentication → URL Configuration：Site URL 改成该域名，Redirect URLs 加上 `https://<项目>.vercel.app/dashboard`
+8. 用真实浏览器走一遍「注册 → 上传 → AI 报告」，确认线上环境变量生效
 
 也可通过 IDE 的部署集成（CloudBase / EdgeOne Makers / Cloud Studio）发布；选择支持 **Node 服务端运行** 的方案，不要选纯静态托管。**当前 IDE 里的部署集成处于未连接状态**，需先在集成面板完成连接，才能由工具直接发布并拿到公网 URL。
 
