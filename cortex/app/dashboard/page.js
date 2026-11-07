@@ -6,6 +6,7 @@ import Papa from "papaparse";
 import { Chart } from "chart.js/auto";
 import { T } from "../../lib/i18n";
 import { buildSmartView } from "../../lib/smart";
+import { normDate } from "../../lib/date";
 import { supabase, supabaseConfigured } from "../../lib/supabaseClient";
 
 const SAMPLE_AGG = {
@@ -65,14 +66,6 @@ function guessMapping(fields) {
   });
   return out;
 }
-const normDate = (v) => {
-  const s = clean(v);
-  if (/^\d{4}$/.test(s)) return s + "-01-01";
-  const m = s.match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
-  if (m) return `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}`;
-  const d = new Date(s);
-  return isNaN(d) ? "" : d.toISOString().slice(0, 10);
-};
 const num = (v) => {
   const n = parseFloat(String(v ?? "").replace(/[^0-9.\-]/g, ""));
   return isNaN(n) ? 0 : n;
@@ -226,7 +219,12 @@ export default function DashboardPage() {
 
   const normRows = (raw) => raw.map((r) => {
     const o = {};
-    Object.keys(r || {}).forEach((k) => { o[clean(k)] = typeof r[k] === "object" && r[k] !== null ? JSON.stringify(r[k]) : r[k]; });
+    Object.keys(r || {}).forEach((k) => {
+      const v = r[k];
+      if (v instanceof Date) o[clean(k)] = isNaN(v.getTime()) ? "" : normDate(v.toISOString());
+      else if (typeof v === "object" && v !== null) o[clean(k)] = JSON.stringify(v);
+      else o[clean(k)] = v;
+    });
     return o;
   });
 
@@ -238,7 +236,7 @@ export default function DashboardPage() {
 
     if (/\.(xlsx|xls)$/.test(name)) {
       const XLSX = await import("xlsx");
-      const wb = XLSX.read(await file.arrayBuffer(), { type: "array" });
+      const wb = XLSX.read(await file.arrayBuffer(), { type: "array", cellDates: true });
       const raw = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: "" });
       const rows = normRows(raw);
       return { rows, fields: rows.length ? Object.keys(rows[0]) : [] };
@@ -274,7 +272,12 @@ export default function DashboardPage() {
         return vals.filter((v) => v > 0).length >= Math.min(3, rows.length);
       }) || "";
     }
-    if (!sel.OrderDate) sel.OrderDate = fields.find((f) => /\d{4}/.test(String(rows[0]?.[f] ?? ""))) || "";
+    if (!sel.OrderDate) {
+      const parsesAsDate = (f) => rows.slice(0, 12).some((r) => normDate(r[f]) !== "");
+      const dateNamed = (f) => /date|time|day|month|year|period|日期|时间|年|月/i.test(f);
+      sel.OrderDate = fields.find((f) => dateNamed(f) && parsesAsDate(f))
+        || fields.find(parsesAsDate) || "";
+    }
     return sel;
   }
 
@@ -366,7 +369,12 @@ export default function DashboardPage() {
     try {
       for (let i = 0; i < payload.length; i += 500) {
         const { error } = await supabase.from("orders").insert(payload.slice(i, i + 500));
-        if (error) { notify("error", t.errTitle, tr(t.errDb, { MSG: error.message })); return; }
+        if (error) {
+          const raw = String(error.message || "");
+          const isDateErr = /time zone displacement|invalid input syntax|field value out of range/i.test(raw);
+          notify("error", t.errTitle, isDateErr ? t.errDbDate : tr(t.errDb, { MSG: raw }));
+          return;
+        }
       }
       await loadOrders(user.id);
       setNotice(null);
