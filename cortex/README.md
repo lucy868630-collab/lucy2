@@ -164,6 +164,13 @@ catch { $_.Exception.Response.StatusCode.value__ }
 
 ## 网站部署：发布可实际访问的原型
 
+### 当前线上状态（2026-11-07）
+
+- **生产地址：https://lucy2-jo6a.vercel.app** —— 已可公开访问，`/` 与 `/dashboard` 返回 200，无凭证调用 AI 接口返回 401。
+- Vercel 项目 `lucy2-jo6a`（team `lucy-6fe2`），从 GitHub 仓库 `lucy868630-collab/lucy2` 的 `main` 分支自动部署，Root Directory `cortex`。
+- 成功页里那个带 hash 的 `lucy2-jo6a-nr1jzvl22-...vercel.app` 是**预览部署**，受 Vercel Authentication 保护（打开会看到 `Login – Vercel`），不要当成交付地址。
+- **待办**：环境变量尚未在 Vercel 配置，线上目前是演示模式——登录/注册不可用，AI 接口报 `DEEPSEEK_API_KEY 未配置`。到项目 **Settings → Environment Variables** 补齐 4 个变量，再 **Deployments → Redeploy**（`NEXT_PUBLIC_*` 在构建时内联，不重新部署不生效）；随后把 Supabase 的 Site URL 改为本域名。
+
 Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态托管。推荐 Vercel（Next.js 官方平台，免费额度够原型用）：
 
 1. 先把代码推到 GitHub 并确认 **Actions 全绿**（见上节）
@@ -185,7 +192,10 @@ Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态�
 - [x] `.env.local` 未被 Git 跟踪，暂存区无明文密钥
 - [x] 代码已推送 GitHub（`main`，公开仓库）
 - [x] Actions 在云端全绿：密钥扫描 / 忽略规则 / `npm ci` / `npm run build`
-- [ ] 公网 URL 可打开，注册 / 上传 / AI 报告三项可用
+- [x] 公网 URL 可打开：`https://lucy2-jo6a.vercel.app`（页面与接口鉴权已验证）
+- [ ] Vercel 补齐 4 个环境变量并 Redeploy
+- [ ] Supabase Site URL / Redirect URLs 指向该域名
+- [ ] 线上注册 / 上传 / AI 报告三项可用
 
 ## React Native / Expo → iOS（了解路径，尚未实施）
 
