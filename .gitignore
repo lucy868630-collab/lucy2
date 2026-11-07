@@ -1,0 +1,39 @@
+# ===== 依赖与构建产物 =====
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# ===== 密钥与本地环境：绝对不要提交 =====
+.env
+.env.local
+.env.*.local
+.env.production
+!.env.example
+*.pem
+*.key
+
+# ===== 日志与运行产物 =====
+*.log
+npm-debug.log*
+cortex_out.log
+cortex_err.log
+
+# ===== 部署工具本地状态 =====
+.vercel
+.netlify
+
+# ===== 编辑器 / 操作系统 =====
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Python =====
+__pycache__/
+*.pyc
+.venv/

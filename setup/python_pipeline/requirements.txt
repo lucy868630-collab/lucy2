@@ -1,0 +1,2 @@
+# 本流水线仅使用 Python 标准库，零第三方依赖。
+# 要求 Python 3.8+（已使用 pathlib / f-string / typing 无关特性）

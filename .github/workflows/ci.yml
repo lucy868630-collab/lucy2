@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cortex
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 扫描明文密钥
+        working-directory: .
+        run: |
+          set +e
+          git grep -nIE 'sk-[A-Za-z0-9]{24,}|apify_api_[A-Za-z0-9]{20,}|eyJ[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|AIza[A-Za-z0-9_-]{20,}' -- .
+          code=$?
+          set -e
+          if [ "$code" -eq 0 ]; then
+            echo "::error::检测到疑似明文 API 密钥，移除后再提交"
+            exit 1
+          elif [ "$code" -ne 1 ]; then
+            echo "::error::密钥扫描执行失败（exit $code）"
+            exit 1
+          fi
+          echo "未发现明文密钥"
+
+      - name: 校验忽略规则
+        working-directory: .
+        run: |
+          if git check-ignore -q cortex/.env.local; then
+            echo ".env.local 已被 .gitignore 覆盖"
+          else
+            echo "::error::.env.local 未被忽略，存在密钥入库风险"
+            exit 1
+          fi
+
+      - name: 准备 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: cortex/package-lock.json
+
+      - name: 安装依赖（锁定版本）
+        run: npm ci
+
+      - name: 生产构建
+        run: npm run build

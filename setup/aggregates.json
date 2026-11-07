@@ -1,0 +1,175 @@
+﻿{
+    "kpi":  {
+                "orders":  500,
+                "cost":  3387.53,
+                "profit":  4737.85,
+                "units":  968,
+                "revenue":  8125.38,
+                "customers":  491
+            },
+    "monthly":  [
+                    {
+                        "month":  "2025-11",
+                        "revenue":  566.78,
+                        "profit":  335.14
+                    },
+                    {
+                        "month":  "2025-12",
+                        "revenue":  795.91,
+                        "profit":  428.63
+                    },
+                    {
+                        "month":  "2026-01",
+                        "revenue":  668.64,
+                        "profit":  364.88
+                    },
+                    {
+                        "month":  "2026-02",
+                        "revenue":  628.71,
+                        "profit":  387.74
+                    },
+                    {
+                        "month":  "2026-03",
+                        "revenue":  653.86,
+                        "profit":  383.29
+                    },
+                    {
+                        "month":  "2026-04",
+                        "revenue":  636.96,
+                        "profit":  369.41
+                    },
+                    {
+                        "month":  "2026-05",
+                        "revenue":  809.05,
+                        "profit":  485.28
+                    },
+                    {
+                        "month":  "2026-06",
+                        "revenue":  672.44,
+                        "profit":  382.52
+                    },
+                    {
+                        "month":  "2026-07",
+                        "revenue":  621.46,
+                        "profit":  382.22
+                    },
+                    {
+                        "month":  "2026-08",
+                        "revenue":  664.62,
+                        "profit":  398.8
+                    },
+                    {
+                        "month":  "2026-09",
+                        "revenue":  741.19,
+                        "profit":  409.75
+                    },
+                    {
+                        "month":  "2026-10",
+                        "revenue":  631.8,
+                        "profit":  387.55
+                    },
+                    {
+                        "month":  "2026-11",
+                        "revenue":  33.96,
+                        "profit":  22.64
+                    }
+                ],
+    "category":  [
+                     {
+                         "key":  "Lunch",
+                         "Revenue_NZD":  1673.06,
+                         "Profit_NZD":  920.18
+                     },
+                     {
+                         "key":  "Retail Beans",
+                         "Revenue_NZD":  2708.83,
+                         "Profit_NZD":  1218.93
+                     },
+                     {
+                         "key":  "Tea",
+                         "Revenue_NZD":  1361.46,
+                         "Profit_NZD":  1021.14
+                     },
+                     {
+                         "key":  "Coffee",
+                         "Revenue_NZD":  1482.78,
+                         "Profit_NZD":  1038.05
+                     },
+                     {
+                         "key":  "Bakery",
+                         "Revenue_NZD":  899.25,
+                         "Profit_NZD":  539.55
+                     }
+                 ],
+    "region":  [
+                   {
+                       "key":  "Hamilton",
+                       "Revenue_NZD":  1149.03,
+                       "Profit_NZD":  670.16
+                   },
+                   {
+                       "key":  "Christchurch",
+                       "Revenue_NZD":  1335.73,
+                       "Profit_NZD":  770.84
+                   },
+                   {
+                       "key":  "Auckland",
+                       "Revenue_NZD":  2791.63,
+                       "Profit_NZD":  1655.07
+                   },
+                   {
+                       "key":  "Dunedin",
+                       "Revenue_NZD":  649.75,
+                       "Profit_NZD":  375.68
+                   },
+                   {
+                       "key":  "Tauranga",
+                       "Revenue_NZD":  854.53,
+                       "Profit_NZD":  475.17
+                   },
+                   {
+                       "key":  "Wellington",
+                       "Revenue_NZD":  1344.71,
+                       "Profit_NZD":  790.93
+                   }
+               ],
+    "channel":  [
+                    {
+                        "key":  "In-store",
+                        "Revenue_NZD":  5413.83,
+                        "Profit_NZD":  3158.97
+                    },
+                    {
+                        "key":  "Online",
+                        "Revenue_NZD":  2711.55,
+                        "Profit_NZD":  1578.88
+                    }
+                ],
+    "topProducts":  [
+                        {
+                            "key":  "House Blend 250g",
+                            "Revenue_NZD":  971.73,
+                            "Profit_NZD":  437.28
+                        },
+                        {
+                            "key":  "Single Origin 250g",
+                            "Revenue_NZD":  884.94,
+                            "Profit_NZD":  398.21
+                        },
+                        {
+                            "key":  "Decaf 250g",
+                            "Revenue_NZD":  852.16,
+                            "Profit_NZD":  383.44
+                        },
+                        {
+                            "key":  "Chai Latte",
+                            "Revenue_NZD":  406.72,
+                            "Profit_NZD":  305.03
+                        },
+                        {
+                            "key":  "Pie",
+                            "Revenue_NZD":  391.19,
+                            "Profit_NZD":  215.17
+                        }
+                    ]
+}

@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[归档原型 v2.1] 已由 localhost:3000 商业工作台取代</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<style>
+  :root{
+    --bg:#0b0e14; --panel:#121722; --panel2:#171e2c; --border:#232c3e;
+    --text:#e8edf5; --muted:#8b96ab; --accent:#4f8cff; --accent2:#7c5cff;
+    --green:#2ecc8f; --red:#ff5c7a; --radius:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI","Microsoft YaHei",sans-serif}
+  body{background:var(--bg);color:var(--text);min-height:100vh}
+
+  .lang-switch{display:inline-flex;background:var(--panel2);border:1px solid var(--border);border-radius:20px;overflow:hidden;font-size:12px}
+  .lang-switch span{padding:5px 12px;cursor:pointer;color:var(--muted);transition:.15s}
+  .lang-switch span.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:600}
+
+  #login{position:fixed;inset:0;background:radial-gradient(1000px 600px at 70% -10%,rgba(79,140,255,.18),transparent),radial-gradient(800px 500px at 10% 110%,rgba(124,92,255,.15),transparent),var(--bg);display:flex;align-items:center;justify-content:center;z-index:100}
+  .login-card{width:380px;background:var(--panel);border:1px solid var(--border);border-radius:20px;padding:40px 36px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  .logo{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:700;margin-bottom:6px}
+  .logo-dot{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+  .sub{color:var(--muted);font-size:13px;margin-bottom:28px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+  .field input{width:100%;padding:11px 14px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none}
+  .field input:focus{border-color:var(--accent)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:.2s}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+  .btn-primary:hover{filter:brightness(1.15)}
+  .login-card .btn-primary{width:100%;margin-top:8px}
+  .hint{font-size:11px;color:var(--muted);text-align:center;margin-top:14px}
+  .login-lang{text-align:center;margin-top:18px}
+
+  #app{display:none;min-height:100vh}
+  .layout{display:flex;min-height:100vh}
+  .sidebar{width:220px;background:var(--panel);border-right:1px solid var(--border);padding:20px 14px;display:flex;flex-direction:column;gap:4px;position:fixed;top:0;bottom:0}
+  .side-logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;padding:6px 10px 20px}
+  .nav-item{padding:11px 12px;border-radius:10px;color:var(--muted);cursor:pointer;font-size:14px;display:flex;align-items:center;gap:10px;transition:.15s}
+  .nav-item:hover{background:var(--panel2);color:var(--text)}
+  .nav-item.active{background:linear-gradient(135deg,rgba(79,140,255,.18),rgba(124,92,255,.18));color:#fff;font-weight:600}
+  .nav-item .ico{width:18px;text-align:center}
+  .badge-demo{margin-top:auto;background:var(--panel2);border:1px dashed var(--border);border-radius:10px;padding:10px;font-size:11px;color:var(--muted);line-height:1.6}
+
+  .main{flex:1;margin-left:220px;padding:26px 32px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+  .topbar-right{display:flex;align-items:center;gap:14px}
+  .topbar h1{font-size:20px}
+  .user-chip{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+  .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;font-weight:700}
+  .page{display:none}
+  .page.active{display:block}
+
+  /* 时间筛选 */
+  .filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+  .filter-label{font-size:12px;color:var(--muted)}
+  .seg{display:inline-flex;background:var(--panel2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .seg span{padding:7px 14px;font-size:12px;cursor:pointer;color:var(--muted);transition:.15s}
+  .seg span.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:600}
+  .data-src{font-size:11px;color:var(--muted);background:var(--panel2);border:1px solid var(--border);border-radius:20px;padding:5px 12px}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+  .kpi{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px}
+  .kpi .label{font-size:12px;color:var(--muted);margin-bottom:8px}
+  .kpi .value{font-size:24px;font-weight:700}
+  .kpi .delta{font-size:12px;margin-top:6px;color:var(--green)}
+  .kpi .delta.down{color:var(--red)}
+
+  .cards{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+  .cards-even{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+  .card h3{font-size:14px;font-weight:600;margin-bottom:14px;color:var(--text)}
+  .card h3 span{color:var(--muted);font-weight:400;font-size:12px;margin-left:6px}
+  .chart-box{position:relative;height:280px}
+
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{color:var(--muted);text-align:left;font-weight:500;padding:8px 10px;border-bottom:1px solid var(--border)}
+  td{padding:9px 10px;border-bottom:1px solid rgba(35,44,62,.5)}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  th.num{text-align:right}
+  .bar{height:6px;background:var(--panel2);border-radius:4px;overflow:hidden;margin-top:4px}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+
+  .report-actions{display:flex;gap:12px;margin-bottom:18px}
+  .ai-report{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:26px 30px;line-height:1.9;font-size:14px;color:#c9d3e3;white-space:pre-wrap;display:none}
+  .ai-report .rtitle{font-size:17px;font-weight:700;color:var(--text);margin-bottom:12px}
+  .typing::after{content:"▌";color:var(--accent);animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:0}}
+
+  .dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:60px 20px;text-align:center;background:var(--panel);transition:.2s;cursor:pointer}
+  .dropzone:hover,.dropzone.drag{border-color:var(--accent);background:rgba(79,140,255,.05)}
+  .dropzone .big{font-size:40px;margin-bottom:12px}
+  .dropzone p{color:var(--muted);font-size:13px;margin-top:6px}
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:22px}
+  .step{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px;font-size:12px;color:var(--muted)}
+  .step b{display:block;color:var(--text);font-size:13px;margin-bottom:6px}
+  .step .n{display:inline-block;width:22px;height:22px;border-radius:50%;background:var(--panel2);text-align:center;line-height:22px;margin-right:6px;font-size:11px;color:var(--accent)}
+  .status{margin-top:16px;font-size:13px;color:var(--green);display:none}
+  .status.err{color:var(--red)}
+
+  /* AI 设置弹窗 */
+  .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:200}
+  .modal{width:420px;background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:28px}
+  .modal h3{font-size:16px;margin-bottom:18px}
+  .modal .field select{width:100%;padding:11px 14px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none}
+  .modal-actions{display:flex;gap:10px;margin-top:18px}
+  .modal-actions .btn{flex:1}
+
+  @media(max-width:960px){.kpis{grid-template-columns:repeat(2,1fr)}.cards,.cards-even{grid-template-columns:1fr}.steps{grid-template-columns:repeat(2,1fr)}.sidebar{display:none}.main{margin-left:0}}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="login-card">
+    <div class="logo"><div class="logo-dot"></div>Cortex</div>
+    <div class="sub" data-i18n="loginSub"></div>
+    <div class="field"><label data-i18n="loginEmail"></label><input id="email" type="email" placeholder="you@business.co.nz"></div>
+    <div class="field"><label data-i18n="loginPwd"></label><input type="password" placeholder="••••••••"></div>
+    <button class="btn btn-primary" onclick="doLogin()" data-i18n="loginBtn"></button>
+    <div class="hint" data-i18n="loginHint"></div>
+    <div class="login-lang"><div class="lang-switch" id="langLogin"></div></div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-logo"><div class="logo-dot"></div>Cortex</div>
+      <div class="nav-item active" data-page="dashboard"><span class="ico">📊</span><span data-i18n="navDash"></span></div>
+      <div class="nav-item" data-page="report"><span class="ico">🤖</span><span data-i18n="navReport"></span></div>
+      <div class="nav-item" data-page="upload"><span class="ico">📤</span><span data-i18n="navUpload"></span></div>
+      <div class="nav-item" data-page="roadmap"><span class="ico">🗺️</span><span data-i18n="navRoadmap"></span></div>
+      <div class="badge-demo" id="badgeDemo"></div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <h1 id="pageTitle"></h1>
+        <div class="topbar-right">
+          <div class="lang-switch" id="langTop"></div>
+          <div class="user-chip"><div class="avatar">Y</div><span data-i18n="demoUser"></span></div>
+        </div>
+      </div>
+
+      <!-- 数据概览 -->
+      <section class="page active" id="page-dashboard">
+        <div class="filter-bar">
+          <span class="filter-label" data-i18n="filterLabel"></span>
+          <div class="seg" id="rangeSeg">
+            <span data-r="all" class="on" data-i18n="fAll"></span>
+            <span data-r="12m" data-i18n="f12m"></span>
+            <span data-r="6m" data-i18n="f6m"></span>
+            <span data-r="3m" data-i18n="f3m"></span>
+          </div>
+          <span class="data-src" id="dataSource"></span>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="label" data-i18n="kpiRevenue"></div><div class="value" id="kpiRevenue">—</div><div class="delta" id="kpiRevDelta"></div></div>
+          <div class="kpi"><div class="label" data-i18n="kpiProfit"></div><div class="value" id="kpiProfit">—</div><div class="delta" id="kpiMargin"></div></div>
+          <div class="kpi"><div class="label" data-i18n="kpiOrders"></div><div class="value" id="kpiOrders">—</div><div class="delta" id="kpiOrdersDelta"></div></div>
+          <div class="kpi"><div class="label" data-i18n="kpiUnits"></div><div class="value" id="kpiUnits">—</div><div class="delta" id="kpiUnitsDelta"></div></div>
+        </div>
+
+        <div class="cards">
+          <div class="card">
+            <h3><span data-i18n="chMonthlyTitle"></span><span data-i18n="chMonthlySub"></span></h3>
+            <div class="chart-box"><canvas id="chMonthly"></canvas></div>
+          </div>
+          <div class="card">
+            <h3><span data-i18n="chCategoryTitle"></span><span data-i18n="chFullPeriod"></span></h3>
+            <div class="chart-box"><canvas id="chCategory"></canvas></div>
+          </div>
+        </div>
+
+        <div class="cards-even">
+          <div class="card">
+            <h3><span data-i18n="chRegionTitle"></span><span data-i18n="chFullPeriod"></span></h3>
+            <div class="chart-box"><canvas id="chRegion"></canvas></div>
+          </div>
+          <div class="card">
+            <h3><span data-i18n="chMarginTitle"></span><span data-i18n="chFullPeriod"></span></h3>
+            <div class="chart-box"><canvas id="chMargin"></canvas></div>
+          </div>
+        </div>
+
+        <div class="cards">
+          <div class="card">
+            <h3><span data-i18n="chChannelTitle"></span><span data-i18n="chFullPeriod"></span></h3>
+            <div class="chart-box"><canvas id="chChannel"></canvas></div>
+          </div>
+          <div class="card">
+            <h3><span data-i18n="chTopTitle"></span><span data-i18n="chTopSub"></span></h3>
+            <table id="topTable"></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- AI 报告 -->
+      <section class="page" id="page-report">
+        <div class="report-actions">
+          <button class="btn btn-primary" onclick="genReport()">🤖 <span data-i18n="btnGenReport"></span></button>
+          <button class="btn" style="background:var(--panel2);color:var(--text);border:1px solid var(--border)" onclick="downloadReport()">⬇️ <span data-i18n="btnExport"></span></button>
+          <button class="btn" style="background:var(--panel2);color:var(--text);border:1px solid var(--border)" onclick="openAISettings()">⚙️ <span data-i18n="aiSettings"></span></button>
+        </div>
+        <div class="ai-report" id="aiMode" style="display:none;margin-bottom:16px;padding:14px 18px;font-size:13px"></div>
+        <div class="ai-report" id="report"></div>
+      </section>
+
+      <!-- 数据上传 -->
+      <section class="page" id="page-upload">
+        <input type="file" id="fileInput" accept=".csv" style="display:none">
+        <div class="dropzone" id="dz">
+          <div class="big">📁</div>
+          <div style="font-weight:600" data-i18n="dzTitle"></div>
+          <p data-i18n="dzSub"></p>
+          <p style="margin-top:10px;color:var(--accent)" data-i18n="dzTip"></p>
+        </div>
+        <div class="status" id="upStatus"></div>
+        <div class="steps">
+          <div class="step"><b><span class="n">1</span><span data-i18n="step1T"></span></b><span data-i18n="step1D"></span></div>
+          <div class="step"><b><span class="n">2</span><span data-i18n="step2T"></span></b><span data-i18n="step2D"></span></div>
+          <div class="step"><b><span class="n">3</span><span data-i18n="step3T"></span></b><span data-i18n="step3D"></span></div>
+          <div class="step"><b><span class="n">4</span><span data-i18n="step4T"></span></b><span data-i18n="step4D"></span></div>
+        </div>
+      </section>
+
+      <!-- 产品规划 -->
+      <section class="page" id="page-roadmap">
+        <div class="card" style="max-width:720px;line-height:2;font-size:14px;color:#c9d3e3">
+          <h3 style="font-size:16px" data-i18n="roadmapTitle"></h3>
+          <p><span class="tag" data-i18n="layer1Tag"></span><span data-i18n="layer1"></span></p>
+          <p><span class="tag" data-i18n="layer2Tag"></span><span data-i18n="layer2"></span></p>
+          <p><span class="tag" data-i18n="layer3Tag"></span><span data-i18n="layer3"></span></p>
+          <p style="margin-top:14px;color:var(--muted);font-size:12px" data-i18n="roadmapNote"></p>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- AI 设置弹窗 -->
+<div class="modal-mask" id="aiModal">
+  <div class="modal">
+    <h3>⚙️ <span data-i18n="aiSettings"></span></h3>
+    <div class="field"><label data-i18n="aiProvider"></label>
+      <select id="aiProvider">
+        <option value="deepseek">DeepSeek（便宜，推荐）</option>
+        <option value="openai">OpenAI / ChatGPT</option>
+        <option value="custom">Custom（OpenRouter 等）</option>
+      </select>
+    </div>
+    <div class="field"><label data-i18n="aiKey"></label><input id="aiKeyInput" type="password" placeholder="sk-..."></div>
+    <div class="field"><label data-i18n="aiModel"></label><input id="aiModelInput" type="text" list="aiModelList"><datalist id="aiModelList"></datalist></div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.7" data-i18n="aiKeyHint"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="saveAISettings()" data-i18n="aiSave"></button>
+      <button class="btn" style="background:var(--panel2);color:var(--text);border:1px solid var(--border)" onclick="closeAISettings()" data-i18n="aiClose"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= 双语文案 ================= */
+const I18N = {
+  zh:{
+    loginSub:"【归档原型 · 已停用】正式版请访问 localhost:3000（商业工作台）",
+    loginEmail:"邮箱", loginPwd:"密码", loginBtn:"登录 / 注册",
+    loginHint:"原型演示：任意输入或直接点击即可进入",
+    navDash:"数据概览", navReport:"AI 商业报告", navUpload:"数据上传", navRoadmap:"产品规划",
+    demoUser:"演示用户",
+    badgeDemo:"⚡ 原型 v2.0<br>内置示例：sales_data.csv<br>（500 条订单 · 12 个月）",
+    filterLabel:"时间范围：",
+    fAll:"全部", f12m:"近 12 个月", f6m:"近 6 个月", f3m:"近 3 个月",
+    kpiRevenue:"总营收 (NZD)", kpiProfit:"总利润 (NZD)", kpiOrders:"订单数", kpiUnits:"售出件数",
+    kpiRevDeltaFull:"▲ 全部时段累计",
+    chMonthlyTitle:"月度营收与利润", chMonthlySub:"NZD · 随时间筛选联动",
+    chCategoryTitle:"品类营收占比", chRegionTitle:"城市营收排名",
+    chMarginTitle:"品类利润率对比", chChannelTitle:"渠道营收占比",
+    chTopTitle:"热销商品 Top 5", chTopSub:"按营收", chFullPeriod:"· 全部时段",
+    btnGenReport:"生成 AI 商业报告", btnExport:"导出报告 (.txt)",
+    dzTitle:"拖拽 CSV 文件到此处，或点击选择",
+    dzSub:"支持 .csv · 列名需包含 OrderDate / ProductCategory / ProductName / Region / Channel / Quantity / Revenue_NZD / Profit_NZD",
+    dzTip:"💡 立即试用：上传工作区 setup 文件夹里的 sales_data.csv，仪表板将按你的数据重新计算",
+    dzStatus:"✅ 解析成功：{ROWS} 行数据，仪表板与 AI 报告已按你的数据更新！",
+    dzErr:"❌ 解析失败：缺少必要列 {COLS}。请使用与 sales_data.csv 相同格式的文件。",
+    step1T:"上传数据", step1D:"上传销售 CSV，浏览器端即时解析（数据不离开你的电脑）",
+    step2T:"自动聚合", step2D:"按月份、品类、城市、渠道自动分组汇总",
+    step3T:"AI 分析", step3D:"计算 KPI、利润率对比、渠道结构并生成洞察",
+    step4T:"输出结果", step4D:"仪表板联动更新 + AI 商业报告（可导出 txt）",
+    roadmapTitle:"Cortex 三层建设路线",
+    layer1Tag:"第一层 ✅ 进行中", layer1:" BI + AI 工具跑通业务：Power BI 分析销售数据（环境与示例数据已就绪）",
+    layer2Tag:"第二层", layer2:" 自动化后端：Apify 采集竞品价格 → ChatGPT API 分析 → 自动生成报告与营销文案",
+    layer3Tag:"第三层", layer3:" 正式产品：客户注册登录 → 上传数据 → AI 分析 → 在线仪表板 → 下载报告",
+    roadmapNote:"本页面即第三层界面原型 v2.0（新增：真实 CSV 解析、时间筛选、利润率/渠道图表、报告导出）。确认后将以 Next.js + 数据库 + ChatGPT API 实现为正式网站。",
+    legendRev:"营收", legendProfit:"利润", fmtCur:"NZ$ ",
+    pages:{dashboard:"数据概览",report:"AI 商业报告",upload:"数据上传",roadmap:"产品规划"},
+    tblProduct:"商品", tblRevenue:"营收", tblProfit:"利润",
+    reportTitle:"📋 Cortex AI 商业分析报告",
+    dataSource:"数据源：内置示例 sales_data.csv",
+    dataSrcCustom:"数据源：{NAME}（{ROWS} 行）",
+    aiSettings:"AI 设置", aiProvider:"服务商", aiKey:"API Key", aiModel:"模型名称",
+    aiSave:"保存并连接", aiClose:"取消",
+    aiKeyHint:"Key 仅保存在本机浏览器（localStorage），不上传到任何服务器，仅用于本地原型测试。获取地址：DeepSeek → platform.deepseek.com；OpenAI → platform.openai.com/api-keys。正式版将由后端托管密钥。",
+    aiModeReal:"✅ AI 已连接：{PROV} · {MODEL} —— 报告由真实大模型基于你的数据生成",
+    aiModeTpl:"⚠️ 未配置 AI：当前使用本地模板报告（基于数据规则计算）。点击「⚙️ AI 设置」填入 API Key 即可启用真实 AI 生成。",
+    aiGenerating:"🤖 正在调用 AI 分析当前仪表板数据，请稍候（通常 10–30 秒）…",
+    aiError:"❌ AI 调用失败：",
+    aiProvNames:{deepseek:"DeepSeek",openai:"OpenAI",custom:"Custom"},
+    report:`{TITLE}
+{PERIOD}
+
+一、整体表现
+所选时段总营收 {REVENUE}，总利润 {PROFIT}，整体利润率 {MARGIN}%。
+
+二、品类洞察
+· 营收支柱是 {TOPCAT}（{TOPCATREV}，占比 {TOPCATPCT}%）。
+· 利润率最高的是 {HIGHMARGIN}（{HMPCT}%）——建议提高其推荐权重与组合销售。
+· 利润率最低的是 {LOWMARGIN}（{LMPCT}%）——可考虑提价、控制成本或与高毛利品类捆绑。
+
+三、区域洞察
+· {TOPREGION} 是核心市场（{TOPREGIONREV}），应优先投放营销资源。
+· {LASTREGION} 规模最小，适合低成本线上推广试水。
+
+四、渠道建议
+门店渠道占 {STOREPCT}%，线上占 {ONLINEPCT}%。{CHANNELADVICE}
+
+五、AI 营销行动清单（本周可执行）
+1. 在社交媒体主推 {HIGHMARGIN}（高毛利，广告回报最高）。
+2. 对复购间隔超过 90 天的客户发送折扣提醒。
+3. 收银台添加小件高毛利商品的加购话术，提升客单价。
+
+—— 本报告由 Cortex AI 基于当前仪表板数据自动生成。`
+  },
+  en:{
+    loginSub:"[ARCHIVED PROTOTYPE] Use localhost:3000 (Business Workbench)",
+    loginEmail:"Email", loginPwd:"Password", loginBtn:"Sign in / Sign up",
+    loginHint:"Prototype demo: enter anything or just click the button",
+    navDash:"Overview", navReport:"AI Business Report", navUpload:"Upload Data", navRoadmap:"Product Roadmap",
+    demoUser:"Demo User",
+    badgeDemo:"⚡ Prototype v2.0<br>Built-in sample: sales_data.csv<br>(500 orders · 12 months)",
+    filterLabel:"Period:",
+    fAll:"All", f12m:"Last 12 months", f6m:"Last 6 months", f3m:"Last 3 months",
+    kpiRevenue:"Total Revenue (NZD)", kpiProfit:"Total Profit (NZD)", kpiOrders:"Orders", kpiUnits:"Units Sold",
+    kpiRevDeltaFull:"▲ Full period cumulative",
+    chMonthlyTitle:"Monthly Revenue & Profit", chMonthlySub:"NZD · follows period filter",
+    chCategoryTitle:"Revenue by Category", chRegionTitle:"Revenue by City",
+    chMarginTitle:"Profit Margin by Category", chChannelTitle:"Revenue by Channel",
+    chTopTitle:"Top 5 Products", chTopSub:"by revenue", chFullPeriod:"· full period",
+    btnGenReport:"Generate AI Business Report", btnExport:"Export Report (.txt)",
+    dzTitle:"Drag & drop a CSV file here, or click to browse",
+    dzSub:"Supports .csv · Required columns: OrderDate / ProductCategory / ProductName / Region / Channel / Quantity / Revenue_NZD / Profit_NZD",
+    dzTip:"💡 Try it now: upload sales_data.csv from the workspace setup folder — the dashboard recalculates with your data",
+    dzStatus:"✅ Parsed {ROWS} rows — dashboard & AI report updated with your data!",
+    dzErr:"❌ Parse failed: missing required columns {COLS}. Please use a file with the same format as sales_data.csv.",
+    step1T:"Upload Data", step1D:"Upload a sales CSV; parsed instantly in your browser (data never leaves your machine)",
+    step2T:"Auto Aggregate", step2D:"Grouped automatically by month, category, city and channel",
+    step3T:"AI Analysis", step3D:"KPIs, margin comparison, channel mix and business insights",
+    step4T:"Output", step4D:"Dashboard updates live + AI business report (txt export)",
+    roadmapTitle:"Cortex Three-Layer Roadmap",
+    layer1Tag:"Layer 1 ✅ In Progress", layer1:" BI + AI tools in action: Power BI sales analytics (environment & sample data ready)",
+    layer2Tag:"Layer 2", layer2:" Automation backend: Apify competitor price scraping → ChatGPT API analysis → auto reports & marketing copy",
+    layer3Tag:"Layer 3", layer3:" Production product: customer sign-up → upload data → AI analysis → online dashboard → downloadable reports",
+    roadmapNote:"This page is the Layer-3 UI prototype v2.0 (new: real CSV parsing, period filter, margin & channel charts, report export). Once confirmed, it will be built as a production site with Next.js + database + ChatGPT API.",
+    legendRev:"Revenue", legendProfit:"Profit", fmtCur:"NZ$ ",
+    pages:{dashboard:"Overview",report:"AI Business Report",upload:"Upload Data",roadmap:"Product Roadmap"},
+    tblProduct:"Product", tblRevenue:"Revenue", tblProfit:"Profit",
+    reportTitle:"📋 Cortex AI Business Analysis Report",
+    dataSource:"Data source: built-in sample sales_data.csv",
+    dataSrcCustom:"Data source: {NAME} ({ROWS} rows)",
+    aiSettings:"AI Settings", aiProvider:"Provider", aiKey:"API Key", aiModel:"Model name",
+    aiSave:"Save & Connect", aiClose:"Cancel",
+    aiKeyHint:"The key is stored only in this browser (localStorage), never uploaded to any server — for local prototype testing only. Get one: DeepSeek → platform.deepseek.com; OpenAI → platform.openai.com/api-keys. The production version will manage keys server-side.",
+    aiModeReal:"✅ AI connected: {PROV} · {MODEL} — reports generated by a real LLM from your data",
+    aiModeTpl:"⚠️ AI not configured: using the local template report (rule-based on your data). Click '⚙️ AI Settings' to add an API Key for real AI generation.",
+    aiGenerating:"🤖 Calling AI to analyse the current dashboard data, please wait (usually 10–30s)…",
+    aiError:"❌ AI call failed: ",
+    aiProvNames:{deepseek:"DeepSeek",openai:"OpenAI",custom:"Custom"},
+    report:`{TITLE}
+{PERIOD}
+
+1. Overall Performance
+Total revenue of {REVENUE} with total profit of {PROFIT} — an overall margin of {MARGIN}% for the selected period.
+
+2. Category Insights
+· Revenue pillar: {TOPCAT} ({TOPCATREV}, {TOPCATPCT}% of total).
+· Highest margin: {HIGHMARGIN} ({HMPCT}%) — give it more menu prominence and bundle offers.
+· Lowest margin: {LOWMARGIN} ({LMPCT}%) — consider pricing review, cost control, or bundling with high-margin items.
+
+3. Regional Insights
+· {TOPREGION} is the core market ({TOPREGIONREV}); prioritise marketing spend there.
+· {LASTREGION} is the smallest — a good fit for low-cost online promotion.
+
+4. Channel Strategy
+In-store accounts for {STOREPCT}% of revenue, online {ONLINEPCT}%. {CHANNELADVICE}
+
+5. AI Marketing Actions (this week)
+1. Promote {HIGHMARGIN} on social media — highest margin means the best ad ROI.
+2. Send a discount reminder to customers inactive for 90+ days.
+3. Add counter upsell scripts for small high-margin items to lift average order value.
+
+—— Auto-generated by Cortex AI based on the current dashboard data.`
+  }
+};
+
+/* ================= 数据模型 ================= */
+let DATA = null;           // 全量聚合 {monthly, category, region, channel, top, meta}
+let curRange = "all";      // all | 12m | 6m | 3m
+let customSource = null;   // {name, rows}
+
+/* 内置示例数据（与 sales_data.csv / Power BI 同源） */
+const SAMPLE = {
+  monthly:[["2025-11",566.78,335.14,33,69],["2025-12",795.91,428.63,38,74],["2026-01",668.64,364.88,38,65],["2026-02",628.71,387.74,39,86],["2026-03",653.86,383.29,46,83],["2026-04",636.96,369.41,45,75],["2026-05",809.05,485.28,50,105],["2026-06",672.44,382.52,39,73],["2026-07",621.46,382.22,44,80],["2026-08",664.62,398.80,45,91],["2026-09",741.19,409.75,39,73],["2026-10",631.80,387.55,40,88],["2026-11",33.96,22.64,4,6]],
+  category:[["Retail Beans",2708.83,1218.93],["Lunch",1673.06,920.18],["Coffee",1482.78,1038.05],["Tea",1361.46,1021.14],["Bakery",899.25,539.55]],
+  region:[["Auckland",2791.63,1655.07],["Wellington",1344.71,790.93],["Christchurch",1335.73,770.84],["Hamilton",1149.03,670.16],["Tauranga",854.53,475.17],["Dunedin",649.75,375.68]],
+  channel:[["In-store",5413.83,3158.97],["Online",2711.55,1578.88]],
+  top:[["House Blend 250g",971.73,437.28],["Single Origin 250g",884.94,398.21],["Decaf 250g",852.16,383.44],["Chai Latte",406.72,305.03],["Pie",391.19,215.17]],
+  meta:{customers:491, rows:500}
+};
+
+const $=s=>document.querySelector(s);
+let lang="zh";
+const T=()=>I18N[lang];
+const fmt=n=>T().fmtCur+(+n).toLocaleString("en-NZ",{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct=(a,b)=>b>0?(a/b*100).toFixed(1):"0";
+
+/* 由原始行聚合（用于上传的真实 CSV） */
+function aggregateRows(rows){
+  const byMonth={},byCat={},byRegion={},byChan={},byProd={};
+  const bump=(o,k,rev,prof,ord,units)=>{o[k]=o[k]||[0,0,0,0];o[k][0]+=rev;o[k][1]+=prof;o[k][2]+=ord?1:0;o[k][3]+=units};
+  rows.forEach(r=>{
+    const d=new Date(r.OrderDate);if(isNaN(d))return;
+    const m=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+    const rev=+r.Revenue_NZD||0,prof=+r.Profit_NZD||0,q=+r.Quantity||0;
+    bump(byMonth,m,rev,prof,true,q);
+    bump(byCat,r.ProductCategory,rev,prof,true,q);
+    bump(byRegion,r.Region,rev,prof,true,q);
+    bump(byChan,r.Channel,rev,prof,true,q);
+    bump(byProd,r.ProductName,rev,prof,true,q);
+  });
+  const toArr=o=>Object.entries(o).map(([k,v])=>[k,+v[0].toFixed(2),+v[1].toFixed(2),v[2],v[3]]);
+  const sortByRev=a=>a.sort((x,y)=>y[1]-x[1]);
+  const top=sortByRev(toArr(byProd)).slice(0,5);
+  return {
+    monthly:toArr(byMonth).sort((a,b)=>a[0].localeCompare(b[0])),
+    category:sortByRev(toArr(byCat)),
+    region:sortByRev(toArr(byRegion)),
+    channel:sortByRev(toArr(byChan)),
+    top,
+    meta:{rows:rows.length,customers:new Set(rows.map(r=>r.CustomerID)).size}
+  };
+}
+
+function setData(agg,src){
+  DATA=agg;customSource=src;
+  curRange="all";
+  document.querySelectorAll("#rangeSeg span").forEach(s=>s.classList.toggle("on",s.dataset.r==="all"));
+  applyLang(); // 触发全量重绘
+}
+
+/* 时段筛选后的月度切片 */
+function filteredMonthly(){
+  const n=DATA.monthly.length;
+  const keep=curRange==="all"?n:curRange==="12m"?12:curRange==="6m"?6:3;
+  return DATA.monthly.slice(Math.max(0,n-keep));
+}
+function sumMonthly(ms,idx){return ms.reduce((s,m)=>s+m[idx],0)}
+
+/* ================= 语言 ================= */
+function buildLangSwitch(el){
+  el.innerHTML=`<span data-l="zh" class="${lang==='zh'?'on':''}">中文</span><span data-l="en" class="${lang==='en'?'on':''}">EN</span>`;
+  el.querySelectorAll("span").forEach(s=>s.addEventListener("click",()=>{lang=s.dataset.l;applyLang()}));
+}
+
+let charts=[];
+function applyLang(){
+  buildLangSwitch($("#langLogin"));
+  buildLangSwitch($("#langTop"));
+  document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=T()[el.dataset.i18n]||""});
+  $("#badgeDemo").innerHTML=T().badgeDemo;
+  $("#dataSource").textContent=customSource
+    ? T().dataSrcCustom.replace("{NAME}",customSource.name).replace("{ROWS}",DATA.meta.rows)
+    : T().dataSource;
+  document.title=lang==="zh"?"Cortex — AI 商业智能工作台":"Cortex — AI Business Intelligence Workbench";
+  const activeNav=document.querySelector(".nav-item.active");
+  if(activeNav)$("#pageTitle").textContent=T().pages[activeNav.dataset.page];
+  if($("#app").style.display==="block"){refreshDashboard();updateAIMode()}
+  $("#report").style.display="none";$("#report").innerHTML="";
+}
+
+/* ================= 登录/导航 ================= */
+function doLogin(){
+  const e=$("#email").value.trim();
+  if(e && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){alert(lang==="zh"?"请输入有效邮箱":"Please enter a valid email");return}
+  $("#login").style.display="none";
+  $("#app").style.display="block";
+  applyLang();
+}
+document.querySelectorAll(".nav-item").forEach(el=>{
+  el.addEventListener("click",()=>{
+    document.querySelectorAll(".nav-item").forEach(x=>x.classList.remove("active"));
+    el.classList.add("active");
+    $("#pageTitle").textContent=T().pages[el.dataset.page];
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    $("#page-"+el.dataset.page).classList.add("active");
+  });
+});
+
+/* 时间筛选 */
+document.querySelectorAll("#rangeSeg span").forEach(s=>{
+  s.addEventListener("click",()=>{
+    document.querySelectorAll("#rangeSeg span").forEach(x=>x.classList.remove("on"));
+    s.classList.add("on");curRange=s.dataset.r;refreshDashboard();
+  });
+});
+
+/* ================= 仪表板 ================= */
+function refreshDashboard(){
+  const ms=filteredMonthly();
+  const rev=sumMonthly(ms,1),prof=sumMonthly(ms,2),ord=sumMonthly(ms,3),units=sumMonthly(ms,4);
+  $("#kpiRevenue").textContent=fmt(rev);
+  $("#kpiProfit").textContent=fmt(prof);
+  $("#kpiMargin").textContent=(lang==="zh"?"利润率 ":"Margin ")+pct(prof,rev)+"%";
+  $("#kpiOrders").textContent=ord;
+  $("#kpiUnits").textContent=units;
+  const dd=T().kpiRevDeltaFull;$("#kpiRevDelta").textContent=curRange==="all"?dd:(lang==="zh"?"▲ 所选时段累计":"▲ Selected period total");
+  $("#kpiOrdersDelta").textContent=(lang==="zh"?"客户数 ":"Customers ")+DATA.meta.customers;
+  $("#kpiUnitsDelta").textContent=DATA.category.length+(lang==="zh"?" 个品类 · ":" categories · ")+DATA.region.length+(lang==="zh"?" 个城市":" cities");
+
+  charts.forEach(c=>c.destroy());charts=[];
+  Chart.defaults.color="#8b96ab";Chart.defaults.borderColor="rgba(35,44,62,.6)";
+
+  charts.push(new Chart($("#chMonthly"),{type:"line",data:{
+    labels:ms.map(m=>m[0]),
+    datasets:[
+      {label:T().legendRev,data:ms.map(m=>m[1]),borderColor:"#4f8cff",backgroundColor:"rgba(79,140,255,.12)",fill:true,tension:.4,pointRadius:3},
+      {label:T().legendProfit,data:ms.map(m=>m[2]),borderColor:"#2ecc8f",backgroundColor:"rgba(46,204,143,.08)",fill:true,tension:.4,pointRadius:3}
+    ]},options:{maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},scales:{y:{ticks:{callback:v=>"$"+v}}}}
+  }));
+
+  charts.push(new Chart($("#chCategory"),{type:"doughnut",data:{
+    labels:DATA.category.map(c=>c[0]),
+    datasets:[{data:DATA.category.map(c=>c[1]),backgroundColor:["#4f8cff","#7c5cff","#2ecc8f","#ffb84f","#ff5c7a","#8b96ab"],borderWidth:0}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{position:"bottom"}}}
+  }));
+
+  charts.push(new Chart($("#chRegion"),{type:"bar",data:{
+    labels:DATA.region.map(r=>r[0]),
+    datasets:[{label:T().legendRev,data:DATA.region.map(r=>r[1]),backgroundColor:"rgba(79,140,255,.55)",borderRadius:6}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>"$"+v}}}}
+  }));
+
+  charts.push(new Chart($("#chMargin"),{type:"bar",data:{
+    labels:DATA.category.map(c=>c[0]),
+    datasets:[{label:lang==="zh"?"利润率 %":"Margin %",data:DATA.category.map(c=>+(pct(c[2],c[1]))),backgroundColor:DATA.category.map(()=> "rgba(124,92,255,.6)"),borderRadius:6}]},
+    options:{indexAxis:"y",maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{callback:v=>v+"%"}}}}
+  }));
+
+  charts.push(new Chart($("#chChannel"),{type:"doughnut",data:{
+    labels:DATA.channel.map(c=>c[0]),
+    datasets:[{data:DATA.channel.map(c=>c[1]),backgroundColor:["#4f8cff","#2ecc8f"],borderWidth:0}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{position:"bottom"}}}
+  }));
+
+  const max=DATA.top[0][1];
+  $("#topTable").innerHTML=`<tr><th>${T().tblProduct}</th><th class="num">${T().tblRevenue}</th><th class="num">${T().tblProfit}</th></tr>`+
+    DATA.top.map(t=>`<tr><td>${t[0]}<div class="bar"><i style="width:${t[1]/max*100}%"></i></div></td><td class="num">${fmt(t[1])}</td><td class="num" style="color:var(--green)">${fmt(t[2])}</td></tr>`).join("");
+}
+
+/* ================= CSV 上传（真实解析） ================= */
+const dz=$("#dz"),fi=$("#fileInput"),st=$("#upStatus");
+dz.addEventListener("click",()=>fi.click());
+dz.addEventListener("dragover",e=>{e.preventDefault();dz.classList.add("drag")});
+dz.addEventListener("dragleave",()=>dz.classList.remove("drag"));
+dz.addEventListener("drop",e=>{e.preventDefault();dz.classList.remove("drag");handleFile(e.dataTransfer.files[0])});
+fi.addEventListener("change",()=>handleFile(fi.files[0]));
+
+const REQUIRED=["OrderDate","ProductCategory","ProductName","Region","Channel","Quantity","Revenue_NZD","Profit_NZD"];
+function handleFile(file){
+  if(!file)return;
+  Papa.parse(file,{header:true,skipEmptyLines:true,complete:res=>{
+    const cols=res.meta.fields||[];
+    const missing=REQUIRED.filter(c=>!cols.includes(c));
+    if(missing.length){
+      st.textContent=T().dzErr.replace("{COLS}",missing.join(", "));
+      st.classList.add("err");st.style.display="block";return;
+    }
+    const clean=res.data.filter(r=>r&&r.OrderDate&&r.Revenue_NZD);
+    if(!clean.length){
+      st.textContent=T().dzErr.replace("{COLS}","-");st.classList.add("err");st.style.display="block";return;
+    }
+    setData(aggregateRows(clean),{name:file.name,rows:clean.length});
+    st.textContent=T().dzStatus.replace("{ROWS}",clean.length);
+    st.classList.remove("err");st.style.display="block";
+    document.querySelector('.nav-item[data-page="dashboard"]').click();
+  }});
+}
+
+/* ================= AI 设置（真实大模型接入） ================= */
+const AI_PRESETS={
+  deepseek:{url:"https://api.deepseek.com/v1",model:"deepseek-chat",models:["deepseek-chat","deepseek-reasoner"]},
+  openai:{url:"https://api.openai.com/v1",model:"gpt-4o-mini",models:["gpt-4o-mini","gpt-4o","gpt-4.1"]},
+  custom:{url:"",model:"",models:[]}
+};
+function aiCfg(){try{return JSON.parse(localStorage.getItem("cortex_ai")||"null")}catch(e){return null}}
+function aiReady(){const c=aiCfg();return !!(c&&c.apiKey)}
+
+function openAISettings(){
+  const c=aiCfg();
+  $("#aiProvider").value=c?c.provider:"deepseek";
+  $("#aiKeyInput").value=c?c.apiKey:"";
+  refreshModelList();
+  if(c)$("#aiModelInput").value=c.model;
+  $("#aiModal").style.display="flex";
+}
+function closeAISettings(){$("#aiModal").style.display="none"}
+function refreshModelList(){
+  const p=$("#aiProvider").value, list=$("#aiModelList");
+  list.innerHTML=(AI_PRESETS[p].models||[]).map(m=>`<option value="${m}">`).join("");
+  if(AI_PRESETS[p].model)$("#aiModelInput").value=AI_PRESETS[p].model;
+}
+$("#aiProvider").addEventListener("change",refreshModelList);
+function saveAISettings(){
+  const cfg={provider:$("#aiProvider").value,apiKey:$("#aiKeyInput").value.trim(),model:$("#aiModelInput").value.trim()};
+  if(!cfg.apiKey){alert(lang==="zh"?"请填写 API Key":"Please enter the API Key");return}
+  if(!cfg.model)cfg.model=AI_PRESETS[cfg.provider].model;
+  localStorage.setItem("cortex_ai",JSON.stringify(cfg));
+  closeAISettings();updateAIMode();
+}
+function updateAIMode(){
+  const el=$("#aiMode");el.style.display="block";
+  if(aiReady()){
+    const c=aiCfg();
+    el.style.color="var(--green)";
+    el.textContent=T().aiModeReal.replace("{PROV}",T().aiProvNames[c.provider]).replace("{MODEL}",c.model);
+  }else{
+    el.style.color="#ffb84f";
+    el.textContent=T().aiModeTpl;
+  }
+}
+
+/* 把当前仪表板数据压缩成 AI 可读的摘要 */
+function dataSummary(){
+  const ms=DATA.monthly,rev=sumMonthly(ms,1),prof=sumMonthly(ms,2);
+  return JSON.stringify({
+    period:curRange, currency:"NZD",
+    totals:{revenue:+rev.toFixed(2),profit:+prof.toFixed(2),margin_pct:+pct(prof,rev),orders:sumMonthly(ms,3),units:sumMonthly(ms,4),customers:DATA.meta.customers},
+    monthly:DATA.monthly.map(m=>({month:m[0],revenue:m[1],profit:m[2]})),
+    category:DATA.category.map(c=>({name:c[0],revenue:c[1],profit:c[2],margin_pct:+pct(c[2],c[1])})),
+    region:DATA.region.map(r=>({name:r[0],revenue:r[1],profit:r[2]})),
+    channel:DATA.channel.map(c=>({name:c[0],revenue:c[1],profit:c[2]})),
+    top_products:DATA.top.map(t=>({name:t[0],revenue:t[1],profit:t[2]})),
+    source:customSource?customSource.name:"built-in sales_data.csv"
+  });
+}
+
+async function callAI(){
+  const c=aiCfg();
+  const base=c.provider==="custom"?c.baseUrl||AI_PRESETS.openai.url:AI_PRESETS[c.provider].url;
+  const langLine=lang==="zh"
+    ?"请用简体中文撰写报告，面向新西兰小企业主，语气专业但易懂。"
+    :"Write the report in English for a NZ small-business owner; professional but easy to read.";
+  const sys="You are Cortex, a senior business analyst for NZ small businesses. Based ONLY on the JSON sales data provided, write a concise business analysis report in plain text with sections: 1) Overall performance 2) Category insights (name highest/lowest margin items) 3) Regional insights 4) Channel strategy 5) A 3-item actionable marketing list for this week. Use the data's actual numbers. Keep it under 500 words. "+langLine;
+  const res=await fetch(base+"/chat/completions",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+c.apiKey},
+    body:JSON.stringify({model:c.model,temperature:0.6,max_tokens:1200,messages:[
+      {role:"system",content:sys},
+      {role:"user",content:"Here is the dashboard data (JSON):\n"+dataSummary()}
+    ]})
+  });
+  if(!res.ok){
+    let msg=res.status;
+    try{const j=await res.json();msg=j.error&&j.error.message?j.error.message:msg}catch(e){}
+    throw new Error(msg);
+  }
+  const j=await res.json();
+  const text=j.choices&&j.choices[0]&&j.choices[0].message?j.choices[0].message.content:"";
+  if(!text)throw new Error("empty response");
+  return text;
+}
+
+/* ================= AI 报告（真实 AI 优先，模板兜底） ================= */
+let lastReportText="";
+function buildReportText(){
+  const ms=DATA.monthly, rev=sumMonthly(ms,1), prof=sumMonthly(ms,2);
+  const cats=DATA.category.map(c=>({name:c[0],rev:c[1],prof:c[2],margin:+pct(c[2],c[1])}));
+  const topCat=cats[0];
+  const sortedByMargin=[...cats].sort((a,b)=>b.margin-a.margin);
+  const hi=sortedByMargin[0], lo=sortedByMargin[sortedByMargin.length-1];
+  const topRegion=DATA.region[0], lastRegion=DATA.region[DATA.region.length-1];
+  const store=DATA.channel.find(c=>/in-?store/i.test(c[0]))||DATA.channel[0];
+  const online=DATA.channel.find(c=>!/in-?store/i.test(c[0]))||DATA.channel[1]||["-",0,0];
+  const storePct=pct(store[1],store[1]+online[1]), onlinePct=pct(online[1],store[1]+online[1]);
+  const advice=+onlinePct<30
+    ? (lang==="zh"?"建议把复购型商品迁移到线上订阅，提升线上占比。":"Consider moving repeat-purchase products to an online subscription to grow the online share.")
+    : (lang==="zh"?"渠道结构均衡，可针对线上做会员积分运营。":"Channel mix is balanced; add loyalty points for online customers.");
+  const period=curRange==="all"
+    ? (lang==="zh"?`数据范围：全部 ${ms.length} 个月 · ${DATA.meta.rows} 笔订单 · ${DATA.meta.customers} 位客户`:`Scope: all ${ms.length} months · ${DATA.meta.rows} orders · ${DATA.meta.customers} customers`)
+    : (lang==="zh"?`数据范围：近 ${curRange.replace("m","")} 个月（${ms[0][0]} ~ ${ms[ms.length-1][0]}）`:`Scope: last ${curRange.replace("m","")} months (${ms[0][0]} ~ ${ms[ms.length-1][0]})`);
+  return T().report
+    .replace("{TITLE}",T().reportTitle).replace("{PERIOD}",period)
+    .replace("{REVENUE}",fmt(rev)).replace("{PROFIT}",fmt(prof)).replace("{MARGIN}",pct(prof,rev))
+    .replace("{TOPCAT}",topCat.name).replace("{TOPCATREV}",fmt(topCat.rev)).replace("{TOPCATPCT}",pct(topCat.rev,rev))
+    .replace("{HIGHMARGIN}",hi.name).replace("{HMPCT}",hi.margin)
+    .replace("{LOWMARGIN}",lo.name).replace("{LMPCT}",lo.margin)
+    .replace("{TOPREGION}",topRegion[0]).replace("{TOPREGIONREV}",fmt(topRegion[1]))
+    .replace("{LASTREGION}",lastRegion[0])
+    .replace("{STOREPCT}",storePct).replace("{ONLINEPCT}",onlinePct).replace("{CHANNELADVICE}",advice);
+}
+
+async function genReport(){
+  const r=$("#report");r.style.display="block";
+  updateAIMode();
+
+  /* 未配置 AI：走本地模板 */
+  if(!aiReady()){
+    const text=buildReportText();
+    const step=lang==="zh"?6:3;
+    let i=0;r.classList.add("typing");
+    const timer=setInterval(()=>{
+      r.textContent=text.slice(0,i+=step);
+      if(i>=text.length){
+        clearInterval(timer);r.classList.remove("typing");
+        renderReportHTML(text);
+      }
+    },16);
+    lastReportText=text;
+    return;
+  }
+
+  /* 已配置 AI：调用真实大模型 */
+  r.classList.remove("typing");
+  r.textContent=T().aiGenerating;
+  try{
+    const text=await callAI();
+    lastReportText=text;
+    r.textContent=text;
+  }catch(err){
+    const tpl=buildReportText();
+    lastReportText=tpl;
+    r.textContent=T().aiError+err.message+"\n\n—— 已自动切换为本地模板报告 ——\n\n"+tpl;
+    r.style.whiteSpace="pre-wrap";
+  }
+}
+
+function renderReportHTML(text){
+  const lines=text.split("\n");
+  $("#report").innerHTML="<div class='rtitle'>"+lines[0]+"</div>"+lines.slice(1).map(l=>l.replace(/&/g,"&amp;").replace(/</g,"&lt;")).join("<br>");
+}
+
+function downloadReport(){
+  if(!lastReportText)lastReportText=buildReportText();
+  const blob=new Blob([lastReportText],{type:"text/plain;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="cortex_report_"+new Date().toISOString().slice(0,10)+".txt";
+  a.click();URL.revokeObjectURL(a.href);
+}
+
+/* ================= 初始化 ================= */
+setData(SAMPLE,null);
+
+/* 自动加载本地 AI 配置（仅当用户尚未手动配置时生效） */
+fetch("ai_config.json")
+  .then(r=>r.ok?r.json():null)
+  .then(cfg=>{
+    if(cfg&&cfg.apiKey&&!localStorage.getItem("cortex_ai")){
+      localStorage.setItem("cortex_ai",JSON.stringify(cfg));
+      if($("#app").style.display==="block")updateAIMode();
+    }
+  })
+  .catch(()=>{});

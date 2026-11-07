@@ -1,0 +1,5 @@
+{
+  "provider": "deepseek",
+  "apiKey": "YOUR_DEEPSEEK_API_KEY",
+  "model": "deepseek-chat"
+}
