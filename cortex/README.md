@@ -164,14 +164,16 @@ catch { $_.Exception.Response.StatusCode.value__ }
 
 ## 网站部署：发布可实际访问的原型
 
-### 当前线上状态（2026-11-07，已上线）
+### 当前线上状态（2026-11-08，已修复并验收）
 
-- **生产地址：https://lucy2-jo6a.vercel.app** —— 公开可访问，`/` 与 `/dashboard` 返回 200，首页已不再显示「尚未配置 Supabase」。
-- Vercel 项目 `lucy2-jo6a`（team `lucy-6fe2`），Root Directory `cortex`，Framework `Next.js`。4 个环境变量在项目 Settings → Environment Variables 中配置为 Secret 类型、Production + Preview 作用域。
-- 线上验收：无凭证调 AI 接口返回 401；用 Supabase 注册账号取得 token 后调 `/api/profile` 返回 200 且包含 AI 数据画像（DeepSeek 链路通）。
-- 成功页里带 hash 的 `…-nr1jzvl22-…vercel.app` 受 Vercel Authentication 保护（打开会看到 `Login – Vercel`），**交付只用生产域名**。
-- 最终生产部署方式：`vercel deploy --prod --force --project lucy2-jo6a --scope lucy-6fe2`，**必须从仓库根上传**（Root Directory 是 `cortex`，从 `cortex/` 目录上传会因找不到该目录而构建失败），并显式用 `--build-env` / `--env` 注入 4 个值。
-- **已知待办（不阻塞交付）**：Git push 自动部署未生效，需要时再检查项目 Git 连接；若日后从 GitHub 重新部署时发现 `NEXT_PUBLIC_*` 未内联，把这三个变量从 Secret 改为 Config 类型（它们本来就会进浏览器包）。Supabase 的 Site URL / Redirect URLs 仍指向本地，只影响 Google 登录与邮件确认链接，邮箱密码登录不受影响。
+- **生产地址：https://lucy2-jo6a.vercel.app** —— 公开可访问，`/` 与 `/dashboard` 返回 200，首页不再显示「尚未配置 Supabase」。
+- Vercel 项目 `lucy2-jo6a`（team `lucy-6fe2`），Root Directory `cortex`，Framework `Next.js`。4 个环境变量在 Settings → Environment Variables 中为 Sensitive 类型、Production + Preview 作用域。
+- **重要修复（2026-11-08）**：此前线上前端 bundle 内联的仍是 `https://placeholder.supabase.co`，`supabaseConfigured=false`，站点实际停留在演示模式，注册请求根本不会发给 Supabase——这才是「收不到确认邮件」的真实原因。从仓库根用 `--build-env` / `--env` 显式注入 4 个变量并 `--force` 重新部署后，bundle 已内联真实项目地址 `dqmiqkuuudcdgpsuccxb.supabase.co`。
+- **部署命令（必须从仓库根执行）**：`vercel deploy --prod --force --yes --project lucy2-jo6a --scope lucy-6fe2`，并对 4 个变量分别加 `--build-env KEY=VALUE` 与 `--env KEY=VALUE`。从 `cortex/` 内上传会因找不到 Root Directory 而构建失败。`NEXT_PUBLIC_*` 是构建时内联进浏览器包的，改完变量必须重新构建部署，不会即时生效。
+- **注册不发送邮件是预期行为**：Supabase 项目 `mailer_autoconfirm=true`（Confirm email 已关闭），`/auth/v1/signup` 直接返回 access token，前端拿到 session 后自动跳转 `/dashboard`，无需查收确认邮件。若日后需要找回密码等邮件，需在 Supabase 配置自定义 SMTP（免费默认邮件服务有严格限流且常进垃圾箱）。
+- 线上验收：注册直接拿到 session；带 token 调 `/api/profile` 返回 200 且包含 AI 数据画像；无凭证同源请求返回 401（说明 Supabase 鉴权生效，不是演示模式放行）。
+- 成功页里带 hash 的 `…-vercel.app` 受 Vercel Authentication 保护（打开会看到 `Login – Vercel`），**交付只用生产域名**。
+- **已知待办（不阻塞交付）**：Git push 自动部署未生效，需要时再检查项目 Git 连接；项目里 4 个变量仍是 Sensitive 类型（Vercel 不允许把 Sensitive 直接改成 Config），若改用 GitHub 自动部署，需在控制台删除 3 个 `NEXT_PUBLIC_*` 后以明文 Config 重建，并核对构建产物是否内联真实地址；Supabase 的 Site URL / Redirect URLs 仍指向本地，只影响 Google 登录与邮件确认链接；冒烟测试产生的 `smoke_*@example.com` 账号可在 Supabase → Authentication → Users 删除。
 
 Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态托管。推荐 Vercel（Next.js 官方平台，免费额度够原型用）：
 
@@ -196,6 +198,8 @@ Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态�
 - [x] Actions 在云端全绿：密钥扫描 / 忽略规则 / `npm ci` / `npm run build`
 - [x] 公网 URL 可打开：`https://lucy2-jo6a.vercel.app`
 - [x] Vercel 4 个环境变量已配置，生产部署已重建并生效
+- [x] 线上前端已内联真实 Supabase 地址（不再是 placeholder 演示模式）
+- [x] 线上注册免邮件确认，直接拿到 session 并跳转工作台
 - [x] 线上注册 + 带 token 调 AI 画像接口返回 200
 - [ ] Supabase Site URL / Redirect URLs 指向该域名（可选，仅影响 Google 登录 / 邮件确认）
 - [ ] 手动走一遍线上上传文件与 AI 报告

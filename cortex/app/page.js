@@ -10,10 +10,10 @@ const T = {
     login: "登录", signup: "注册",
     email: "邮箱", pwd: "密码（至少 6 位）",
     btnLogin: "登录", btnSignup: "创建账户",
-    okSignup: "✅ 注册成功！请查收邮箱确认邮件后再登录（也可在 Supabase 后台关闭邮箱确认）。",
+    okSignup: "✅ 注册成功！已自动完成邮箱确认，无需等待邮件，可直接登录使用。",
     errCfg: "⚠️ 尚未配置 Supabase：请在 .env.local 中填入项目 URL 和 Anon Key 后重启服务器（详见 README.md 第 2 步）。",
     invalid: "请填写邮箱，密码至少 6 位",
-    mailHint: "收不到确认邮件？Supabase 免费邮件常进垃圾箱或被限流。解决：Dashboard → Authentication → Sign In / Providers → Email → 关闭 Confirm email 后重新注册；或在 Authentication → Users 中找到该邮箱手动确认。",
+    mailHint: "收不到邮件是正常的：本项目已开启邮箱自动确认（Confirm email 已关闭），注册不会发送确认邮件，注册成功即可登录。若日后需要找回密码邮件，需在 Supabase 后台配置自定义 SMTP。",
     googleBtn: "使用 Google 账号登录", orText: "或",
   },
   en: {
@@ -21,10 +21,10 @@ const T = {
     login: "Sign in", signup: "Sign up",
     email: "Email", pwd: "Password (min 6 chars)",
     btnLogin: "Sign in", btnSignup: "Create account",
-    okSignup: "✅ Account created! Check your email for the confirmation link, then sign in.",
+    okSignup: "✅ Account created! Email confirmation is disabled on this project, so you can sign in right away — no email needed.",
     errCfg: "⚠️ Supabase not configured: fill in URL & Anon Key in .env.local and restart (see README.md step 2).",
     invalid: "Enter an email; password must be at least 6 characters",
-    mailHint: "No confirmation email? Supabase free-tier emails often land in spam or get throttled. Fix: Dashboard → Authentication → Sign In / Providers → Email → turn off Confirm email and register again; or manually confirm the user under Authentication → Users.",
+    mailHint: "No email is expected: this project has email confirmation disabled, so sign-up completes without a confirmation message. Custom SMTP in Supabase is required only for password-recovery emails.",
     googleBtn: "Continue with Google", orText: "or",
   },
 };
@@ -63,8 +63,9 @@ export default function LoginPage() {
     setBusy(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({ email, password: pwd });
+        const { data, error } = await supabase.auth.signUp({ email, password: pwd });
         if (error) throw error;
+        if (data?.session) { router.replace("/dashboard"); return; }
         setMsg({ cls: "ok", text: t.okSignup });
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password: pwd });
