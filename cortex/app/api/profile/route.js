@@ -22,7 +22,8 @@ export async function POST(req) {
  "suggestions_zh":["3条具体分析建议"],"suggestions_en":["3 specific analysis suggestions"],
  "caveats_zh":"数据局限或解读注意事项","caveats_en":"Data limitations or interpretation caveats"
 }
-Rules: only use column names that actually exist in fields. Pick at most 4 metrics. Never invent columns. Prefer columns whose sample values are numeric for metrics, and text/categorical for dimensions.`;
+Rules: only use column names that actually exist in fields. Pick at most 4 metrics. Never invent columns. Prefer columns whose sample values are numeric for metrics, and text/categorical for dimensions.
+Language rules: every *_zh field must be Simplified Chinese. The uploaded dataset may be in English or another language, so translate foreign column names, categories and domain terms into natural Chinese within *_zh fields (the original may be added in parentheses on first mention). Every *_en field must be English, translating Chinese terms into English. The machine-readable fields time_column, dimension_columns, metrics[].column and primary_metric must copy the original column names verbatim and must NEVER be translated. Numbers, codes and brand names stay unchanged.`;
 
     const user = JSON.stringify({ fileName, rowCount, fields, sample: (sample || []).slice(0, 6) });
 
