@@ -1,0 +1,10 @@
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.log
+node_modules
+.next
+.vercel
+.git
