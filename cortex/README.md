@@ -164,12 +164,14 @@ catch { $_.Exception.Response.StatusCode.value__ }
 
 ## 网站部署：发布可实际访问的原型
 
-### 当前线上状态（2026-11-07）
+### 当前线上状态（2026-11-07，已上线）
 
-- **生产地址：https://lucy2-jo6a.vercel.app** —— 已可公开访问，`/` 与 `/dashboard` 返回 200，无凭证调用 AI 接口返回 401。
-- Vercel 项目 `lucy2-jo6a`（team `lucy-6fe2`），从 GitHub 仓库 `lucy868630-collab/lucy2` 的 `main` 分支自动部署，Root Directory `cortex`。
-- 成功页里那个带 hash 的 `lucy2-jo6a-nr1jzvl22-...vercel.app` 是**预览部署**，受 Vercel Authentication 保护（打开会看到 `Login – Vercel`），不要当成交付地址。
-- **待办**：环境变量尚未在 Vercel 配置，线上目前是演示模式——登录/注册不可用，AI 接口报 `DEEPSEEK_API_KEY 未配置`。到项目 **Settings → Environment Variables** 补齐 4 个变量，再 **Deployments → Redeploy**（`NEXT_PUBLIC_*` 在构建时内联，不重新部署不生效）；随后把 Supabase 的 Site URL 改为本域名。
+- **生产地址：https://lucy2-jo6a.vercel.app** —— 公开可访问，`/` 与 `/dashboard` 返回 200，首页已不再显示「尚未配置 Supabase」。
+- Vercel 项目 `lucy2-jo6a`（team `lucy-6fe2`），Root Directory `cortex`，Framework `Next.js`。4 个环境变量在项目 Settings → Environment Variables 中配置为 Secret 类型、Production + Preview 作用域。
+- 线上验收：无凭证调 AI 接口返回 401；用 Supabase 注册账号取得 token 后调 `/api/profile` 返回 200 且包含 AI 数据画像（DeepSeek 链路通）。
+- 成功页里带 hash 的 `…-nr1jzvl22-…vercel.app` 受 Vercel Authentication 保护（打开会看到 `Login – Vercel`），**交付只用生产域名**。
+- 最终生产部署方式：`vercel deploy --prod --force --project lucy2-jo6a --scope lucy-6fe2`，**必须从仓库根上传**（Root Directory 是 `cortex`，从 `cortex/` 目录上传会因找不到该目录而构建失败），并显式用 `--build-env` / `--env` 注入 4 个值。
+- **已知待办（不阻塞交付）**：Git push 自动部署未生效，需要时再检查项目 Git 连接；若日后从 GitHub 重新部署时发现 `NEXT_PUBLIC_*` 未内联，把这三个变量从 Secret 改为 Config 类型（它们本来就会进浏览器包）。Supabase 的 Site URL / Redirect URLs 仍指向本地，只影响 Google 登录与邮件确认链接，邮箱密码登录不受影响。
 
 Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态托管。推荐 Vercel（Next.js 官方平台，免费额度够原型用）：
 
@@ -192,10 +194,11 @@ Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态�
 - [x] `.env.local` 未被 Git 跟踪，暂存区无明文密钥
 - [x] 代码已推送 GitHub（`main`，公开仓库）
 - [x] Actions 在云端全绿：密钥扫描 / 忽略规则 / `npm ci` / `npm run build`
-- [x] 公网 URL 可打开：`https://lucy2-jo6a.vercel.app`（页面与接口鉴权已验证）
-- [ ] Vercel 补齐 4 个环境变量并 Redeploy
-- [ ] Supabase Site URL / Redirect URLs 指向该域名
-- [ ] 线上注册 / 上传 / AI 报告三项可用
+- [x] 公网 URL 可打开：`https://lucy2-jo6a.vercel.app`
+- [x] Vercel 4 个环境变量已配置，生产部署已重建并生效
+- [x] 线上注册 + 带 token 调 AI 画像接口返回 200
+- [ ] Supabase Site URL / Redirect URLs 指向该域名（可选，仅影响 Google 登录 / 邮件确认）
+- [ ] 手动走一遍线上上传文件与 AI 报告
 
 ## React Native / Expo → iOS（了解路径，尚未实施）
 
