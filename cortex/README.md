@@ -84,7 +84,9 @@ npm run start
 
 建议**仓库根设在工作区根**（`20261107092205/`），这样 `cortex/`、`setup/`、`website/` 都在同一个仓库里。
 
-本机已安装 Git 2.56；换机器时用 `winget install --id Git.Git -e --source winget` 安装。仓库已完成 `git init` 与首次暂存，**剩下的是设置提交身份、提交与推送**：
+本机已安装 Git 2.56；换机器时用 `winget install --id Git.Git -e --source winget` 安装。
+
+代码已推送到 `https://github.com/lucy868630-collab/lucy2.git`（公开仓库，默认分支 `main`），云端 CI 已全绿。以下命令是首次搭建的记录，**换机器时请直接 `git clone` 该仓库，不要在现有仓库里重复执行 `git init`**：
 
 ```powershell
 cd C:\Users\yinxi\CodeBuddy\20261107092205
@@ -124,7 +126,7 @@ CI 不需要任何真实密钥；`NEXT_PUBLIC_*` 与 `DEEPSEEK_API_KEY` 只在�
 - `schema.sql` 的 RLS 保证每个用户只能 select / insert / delete 自己的 `orders` 行。
 - AI 密钥只在服务端读取，浏览器包里不含 `DEEPSEEK_API_KEY`。
 
-**历史遗留已清理**：`setup/gen_ai_report.ps1` 与 `website/ai_config.json` 曾把真实密钥硬编码在文件里，现已分别改为「从环境变量 / `.env.local` 读取」和占位符。这枚旧密钥应视为已泄露，**请到 DeepSeek 控制台轮换密钥**，并同步更新 `cortex/.env.local`。归档原型 `website/` 是前端直连 AI 的旧架构，已停用，不要把它当成正式版使用。
+**历史遗留已清理**：`setup/gen_ai_report.ps1`、`website/ai_config.json`、`setup/run_apify_scrape.ps1` 曾分别硬编码 DeepSeek 与 Apify 的真实令牌，现已全部改为「从环境变量 / `.env.local` 读取」或占位符。首次推送时被 **GitHub Secret Scanning 拦截**（命中提交内的 Apify token），清理后 `git commit --amend` 重写提交才放行——只改工作区文件是没用的，令牌已进入提交历史就必须重写历史。**这些旧令牌都应视为已泄露，请到 DeepSeek / Apify 控制台轮换**，并同步更新 `cortex/.env.local`。归档原型 `website/` 是前端直连 AI 的旧架构，已停用，不要把它当成正式版使用。
 
 **已知局限（基础安全 ≠ 生产安全）**：内存限流在 Serverless 多实例之间不共享，正式运营应换成 Vercel KV / Upstash 等集中式限流；anon key 本来就是公开的，安全性完全依赖 RLS 策略是否正确。
 
@@ -180,9 +182,8 @@ Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态�
 - [x] 本地 `/`、`/dashboard` 返回 200
 - [x] 无凭证调用 AI 接口被拒绝
 - [x] `.env.local` 未被 Git 跟踪，暂存区无明文密钥
-- [x] GitHub Actions 工作流已就绪，本地演练（密钥扫描 / 忽略规则 / YAML）通过
-- [ ] 代码已提交并推送 GitHub（待设置 Git 提交身份）
-- [ ] Actions 在云端全绿
+- [x] 代码已推送 GitHub（`main`，公开仓库）
+- [x] Actions 在云端全绿：密钥扫描 / 忽略规则 / `npm ci` / `npm run build`
 - [ ] 公网 URL 可打开，注册 / 上传 / AI 报告三项可用
 
 ## React Native / Expo → iOS（了解路径，尚未实施）
