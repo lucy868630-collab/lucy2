@@ -111,7 +111,9 @@ export default function DashboardPage() {
   const [profileBusy, setProfileBusy] = useState(false);
   const [busyUpload, setBusyUpload] = useState(false);
   const [report, setReport] = useState("");
+  const [reportLang, setReportLang] = useState("zh");
   const [busyAI, setBusyAI] = useState(false);
+  const [busyTranslate, setBusyTranslate] = useState(false);
   const chartsRef = useRef([]);
   const t = T[lang];
   const fmt = (n) => "NZ$ " + (+n).toLocaleString("en-NZ", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -407,9 +409,31 @@ export default function DashboardPage() {
       const resp = await fetch("/api/report", { method: "POST", headers: await aiHeaders(), body: JSON.stringify({ summary, lang }) });
       const j = await resp.json();
       setReport(j.error ? tr(t.errAI, { MSG: j.error }) : j.report);
+      setReportLang(j.error ? "" : lang);
     } catch (err) {
       setReport(tr(t.errAI, { MSG: err.message }));
+      setReportLang("");
     } finally { setBusyAI(false); }
+  }
+
+  async function translateReport() {
+    if (!report || busyTranslate) return;
+    setBusyTranslate(true);
+    try {
+      const resp = await fetch("/api/translate", {
+        method: "POST", headers: await aiHeaders(),
+        body: JSON.stringify({ text: report, targetLang: lang, kind: "report" }),
+      });
+      const j = await resp.json();
+      if (j.error || !j.data?.text) {
+        notify("error", t.reportTitle, tr(t.errTranslate, { MSG: j.error || "empty response" }));
+        return;
+      }
+      setReport(j.data.text);
+      setReportLang(lang);
+    } catch (err) {
+      notify("error", t.reportTitle, tr(t.errTranslate, { MSG: err.message }));
+    } finally { setBusyTranslate(false); }
   }
 
   function exportReport() {
@@ -630,8 +654,14 @@ export default function DashboardPage() {
           <div className="section-head"><h2>{t.reportTitle}</h2><p>{t.reportDesc}</p></div>
           <div className="report-actions">
             <button className="btn btn-primary" onClick={genReport} disabled={busyAI}>{busyAI ? t.generating : t.genReport}</button>
+            {report && reportLang && reportLang !== lang && (
+              <button className="btn btn-ghost" onClick={translateReport} disabled={busyTranslate}>
+                {busyTranslate ? t.translating : tr(t.translateBtn, { LANG: lang === "en" ? "English" : "中文" })}
+              </button>
+            )}
             <button className="btn btn-ghost" onClick={exportReport} disabled={!report}>{t.exportBtn}</button>
           </div>
+          {report && reportLang && reportLang !== lang && !busyAI && !busyTranslate && <div className="report-empty">{t.reportLangHint}</div>}
           {!report && !busyAI && <div className="report-empty">{t.reportEmpty}</div>}
           {(report || busyAI) && <div className="ai-report show">{busyAI ? t.generating : report}</div>}
         </section>

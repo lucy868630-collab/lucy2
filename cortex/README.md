@@ -82,6 +82,8 @@ npm run start
 
 **语言自动跟随**：界面选「中文」时，即使上传的是英文或其它语言的数据，AI 商业报告与数据画像也会把列名、品类、地区、渠道等术语自动译成简体中文（首次出现可括号附原文）；选「EN」时反向译成英文。用于程序匹配的原始列名保持不变，不影响图表与数值。
 
+**界面语言与内容一致**：KPI、图表标签、AI 数据画像随界面语言即时切换，AI 报告按 `lang` 生成。若切换语言后已生成的报告语言与界面不一致，报告区会出现「翻译为 中文 / Translate to English」按钮，调用 `/api/translate` 一键翻译，无需重新生成报告，数字、货币与原始列名保持不变。`/api/translate` 同时支持 `items` 批量模式：营销落地页 `relaywork.html` 的中英文使用内置字典，其它语言（日 / 西 / 法）由模型分批翻译，结果缓存在浏览器与服务端。
+
 ## GitHub 代码管理
 
 建议**仓库根设在工作区根**（`20261107092205/`），这样 `cortex/`、`setup/`、`website/` 都在同一个仓库里。
@@ -159,6 +161,7 @@ CI 不需要任何真实密钥；`NEXT_PUBLIC_*` 与 `DEEPSEEK_API_KEY` 只在�
 | POST | `/api/insights` | 对提交行即时聚合（不写库），输入白名单校验 |
 | GET / POST | `/api/vector` | 向量库状态 / `add`、`search` |
 | GET / POST | `/api/ai/chain` | 模型链路信息 / 双语问答（返回调用轨迹） |
+| GET / POST | `/api/translate` | 通用 AI 翻译（单文本 / 批量，保留数字与列名，带缓存） |
 
 `GET /api/insights` 即早先规划的 Phase 1 JSON 接口，后续 App 可直接用 `src/shared/api-client.ts` 调用。
 

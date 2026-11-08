@@ -7,6 +7,7 @@ import { localEmbedding, VECTOR_DIM } from "../src/shared/ai/embeddings.js";
 import { cosineSimilarity, createVectorStore } from "../src/shared/ai/vector.js";
 import { mongoStatus } from "../src/shared/db/mongo.js";
 import { toProblem, ValidationError } from "../src/shared/errors.js";
+import { T } from "../lib/i18n.js";
 import { normDate } from "../lib/date.js";
 
 test("aggregate 按品类汇总并计算利润率", () => {
@@ -111,4 +112,13 @@ test("MongoDB 未配置时安全降级", async () => {
   const status = await mongoStatus();
   assert.equal(status.status, "unconfigured");
   if (prev !== undefined) process.env.MONGODB_URI = prev;
+});
+
+test("中英文字典键完全一致，翻译文案不缺项", () => {
+  assert.deepEqual(Object.keys(T.zh).sort(), Object.keys(T.en).sort());
+  for (const k of ["translateBtn", "translating", "reportLangHint", "errTranslate"]) {
+    assert.ok(T.zh[k] && T.en[k], `missing ${k}`);
+  }
+  assert.ok(T.zh.translateBtn.includes("{LANG}"));
+  assert.ok(T.en.translateBtn.includes("{LANG}"));
 });
