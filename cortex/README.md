@@ -175,8 +175,9 @@ catch { $_.Exception.Response.StatusCode.value__ }
 - 手动部署（备用）：从**仓库根**执行 `vercel deploy --prod --force --yes --project lucy2-jo6a --scope lucy-6fe2`；从 `cortex/` 内上传会因找不到 Root Directory 而失败。项目级变量修好后不再强制需要 `--build-env`，保留显式注入更保险。
 - **注册不发送邮件是预期行为**：Supabase 项目 `mailer_autoconfirm=true`（Confirm email 已关闭），`/auth/v1/signup` 直接返回 access token，前端拿到 session 后自动跳转 `/dashboard`，无需查收确认邮件。若日后需要找回密码等邮件，需在 Supabase 配置自定义 SMTP（免费默认邮件服务有严格限流且常进垃圾箱）。
 - 线上验收：注册直接拿到 session；带 token 调 `/api/profile` 返回 200 且包含 AI 数据画像；无凭证请求返回 401。
+- **端到端验收（2026-11-08）**：线上注册 → 上传写入 → 双语 AI 全链路通过。数据画像的 `*_zh` 字段全中文，而 `time_column` / `dimension_columns` / `metrics[].column` / `primary_metric` 逐字保留 `OrderDate`、`Revenue_NZD` 等英文原列名；中文报告把 `Electronics`、`Auckland` 译成中文并括号附原文，英文报告反向翻译（中文仅出现在括号内原文）。上传链路做了一组对照：经 `lib/date.js` 规范化后的日期写入 `orders` 返回 201，原始坏值 `+111132-12` 返回 400，确认报错根因与修复有效；测试行已删除，残留 0 行。
 - 成功页里带 hash 的 `…-vercel.app` 受 Vercel Authentication 保护（打开会看到 `Login – Vercel`），**交付只用生产域名**。
-- **已知待办（不阻塞交付）**：Supabase 的 Site URL / Redirect URLs 仍指向本地，只影响 Google 登录与邮件确认链接；冒烟测试产生的 `smoke_*@example.com` 账号可在 Supabase → Authentication → Users 删除（本项目未开启用户自删除，Admin API 需要 service_role key）。
+- **已知待办（不阻塞交付）**：Supabase 的 Site URL / Redirect URLs 仍指向本地，只影响 Google 登录与邮件确认链接（需在 Supabase 控制台修改）；冒烟与端到端测试产生的 `smoke_*@example.com`、`e2e_*@example.com` 账号可在 Supabase → Authentication → Users 删除（本项目未开启用户自删除，Admin API 需要 service_role key）。
 
 Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态托管。推荐 Vercel（Next.js 官方平台，免费额度够原型用）：
 
@@ -205,7 +206,7 @@ Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态�
 - [x] 线上注册免邮件确认，直接拿到 session 并跳转工作台
 - [x] 线上注册 + 带 token 调 AI 画像接口返回 200
 - [ ] Supabase Site URL / Redirect URLs 指向该域名（可选，仅影响 Google 登录 / 邮件确认）
-- [ ] 手动走一遍线上上传文件与 AI 报告
+- [x] 线上端到端验收：注册 → 上传写入（含异常日期 201/400 对照）→ 双语 AI 画像 / 报告 → 测试数据清理
 
 ## React Native / Expo → iOS（了解路径，尚未实施）
 
