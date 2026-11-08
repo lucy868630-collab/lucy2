@@ -25,3 +25,7 @@ grant insert on public.waitlist to anon;
 grant usage, select on sequence public.waitlist_id_seq to anon;
 
 create index if not exists waitlist_created_idx on public.waitlist (created_at desc);
+
+-- 强制刷新 PostgREST schema cache，避免刚建完表立刻请求仍报 PGRST205
+-- "Could not find the table 'public.waitlist' in the schema cache"
+notify pgrst, 'reload schema';
