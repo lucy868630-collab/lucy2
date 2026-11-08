@@ -1,0 +1,2 @@
+/* 只引入 utilities，不引入 base/preflight，避免重置存量 globals.css 的样式。 */
+@tailwind utilities;

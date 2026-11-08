@@ -1,4 +1,5 @@
 import "./globals.css";
+import "./tailwind.css";
 
 export const metadata = {
   title: "商业工作台 — BI 分析 · 数据 · AI 报告",

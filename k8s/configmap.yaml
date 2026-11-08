@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cortex-config
+data:
+  AI_PROVIDER: "auto"
+  CACHE_TTL_SECONDS: "60"
+  LOG_LEVEL: "info"
+  REDIS_URL: "redis://redis:6379"
+  MONGODB_URI: "mongodb://mongo:27017"
+# 注意：NEXT_PUBLIC_* 必须在镜像构建期注入（见 cortex/Dockerfile 的 ARG）；
+# 真实密钥请用 Secret，不要写进 ConfigMap 或提交到 Git。

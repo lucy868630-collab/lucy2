@@ -1,0 +1,71 @@
+name: cortex-stack
+
+services:
+  app:
+    build:
+      context: ./cortex
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}
+        NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN: ${NEXT_PUBLIC_ENABLE_GOOGLE_LOGIN:-false}
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      AI_PROVIDER: ${AI_PROVIDER:-auto}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      HF_API_TOKEN: ${HF_API_TOKEN:-}
+      REDIS_URL: redis://redis:6379
+      MONGODB_URI: mongodb://mongo:27017
+      CACHE_TTL_SECONDS: "60"
+      LOG_LEVEL: info
+    depends_on:
+      - redis
+      - mongo
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  gateway:
+    build: ./services/gateway
+    ports:
+      - "3001:3001"
+    environment:
+      UPSTREAM_URL: http://app:3000
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3001
+    depends_on:
+      - app
+
+  ai:
+    build: ./services/ai
+    ports:
+      - "8000:8000"
+    environment:
+      ALLOWED_ORIGINS: http://localhost:3000,http://localhost:3001
+      VECTOR_DIM: "128"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+
+  # 可选本地 PostgreSQL：业务数据默认走 Supabase 托管的 PostgreSQL，
+  # 需要完全离线时用 `docker compose --profile local-db up -d` 启动。
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["local-db"]
+    environment:
+      POSTGRES_DB: cortex
+      POSTGRES_USER: cortex
+      POSTGRES_PASSWORD: cortex_local_only
+    ports:
+      - "5432:5432"

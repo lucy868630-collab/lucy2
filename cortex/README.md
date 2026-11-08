@@ -132,6 +132,63 @@ CI 不需要任何真实密钥；`NEXT_PUBLIC_*` 与 `DEEPSEEK_API_KEY` 只在�
 
 **已知局限（基础安全 ≠ 生产安全）**：内存限流在 Serverless 多实例之间不共享，正式运营应换成 Vercel KV / Upstash 等集中式限流；anon key 本来就是公开的，安全性完全依赖 RLS 策略是否正确。
 
+## 现代全栈 AI 技术栈（v3.1 增量升级）
+
+按「Modern Full-Stack AI Tech Stack」六层图升级。原有登录、上传、AI 报告页面与线上部署完全保留，新增能力走独立目录、可单独启用或关闭。访问 **`/stack`** 可看到六层组件的实时状态（数据来自 `/api/ready`）。
+
+### 六层落地对照
+
+| 层 | 图中技术 | 本项目实现 |
+|---|---|---|
+| Frontend | React / Next.js / TailwindCSS / TypeScript | React 19 + Next.js 15（已有）；`tsconfig.json` + `src/types/insights.ts` + `src/shared/api-client.ts`；Tailwind 加 `tw-` 前缀并关闭 preflight，与 `globals.css` 零冲突 |
+| Backend | Node.js / Express / FastAPI | Next Route Handlers（已有）；`services/gateway` Express 网关（3001：helmet / CORS / 限流 / 代理 / 探针 / 优雅关闭）；`services/ai` FastAPI 微服务（8000：Pydantic 边界校验） |
+| Database | PostgreSQL / MongoDB / Redis | Supabase PostgreSQL + RLS（已有，权威数据）；`src/shared/db/mongo.js` 可选事件存储；`src/shared/cache.js` 缓存旁路，有 `REDIS_URL` 走 Redis，否则内存 TTL |
+| AI & ML | OpenAI API / LangChain / Vector DB / Hugging Face | `src/shared/ai/provider.js` 统一 DeepSeek / OpenAI / HF（OpenAI 兼容协议 + 重试）；`chain.js` prompt→model→parser 编排（可替换 LangChain）；`vector.js` + `embeddings.js` 余弦检索，无密钥时用本地哈希向量 |
+| DevOps | Docker / Kubernetes / GitHub Actions / Vercel / AWS Lambda | `cortex/Dockerfile`、`docker-compose.yml`、`k8s/*.yaml`、`services/lambda/handler.mjs`；CI 增加 typecheck 与测试；Vercel 生产部署不变 |
+| Auth & Security | JWT / OAuth 2.0 | Supabase Auth 的 JWT Bearer（已有 `guard.js`）+ Google OAuth 2.0（已有开关）；新增接口全部走鉴权、限流、输入校验与结构化脱敏日志 |
+
+### 分层与新增接口
+
+`src/` 采用 feature-first 三层：`controller → service → repository`，共享基础设施在 `src/shared/`（config / errors / logger / auth / cache / http / ai / db）。环境变量**只在** `src/shared/config.js` 读取，可选组件缺失时自动降级。
+
+| 方法 | 路径 | 说明 |
+|---|---|---|
+| GET | `/api/health` | 存活探针 |
+| GET | `/api/ready` | 六层逐层就绪状态 |
+| GET | `/api/insights?group=&from=&to=&top=` | 业务 JSON API：JWT 鉴权、读 `orders` 聚合、缓存旁路 |
+| POST | `/api/insights` | 对提交行即时聚合（不写库），输入白名单校验 |
+| GET / POST | `/api/vector` | 向量库状态 / `add`、`search` |
+| GET / POST | `/api/ai/chain` | 模型链路信息 / 双语问答（返回调用轨迹） |
+
+`GET /api/insights` 即早先规划的 Phase 1 JSON 接口，后续 App 可直接用 `src/shared/api-client.ts` 调用。
+
+### 本地运行
+
+```powershell
+# 主应用（3000）
+cd cortex; npm ci; npm run dev
+
+# Express 网关（3001，另开终端）
+cd services/gateway; npm install; npm start
+
+# FastAPI AI 微服务（8000，另开终端）
+cd services/ai; pip install -r requirements.txt
+python -m uvicorn app.main:app --port 8000
+
+# 或一键起全栈（需 Docker）
+docker compose up -d --build
+# 需要本地 PostgreSQL：docker compose --profile local-db up -d
+```
+
+验证：`npm run typecheck`、`npm test`（9 个用例）、`npm run build`、`python -m compileall -q services/ai/app`。
+
+### 哪些组件需要外部账号
+
+- **零配置即可运行**：主应用、网关、AI 微服务的 embeddings / 聚合 / 向量检索、`/stack` 页面、内存缓存。
+- **需配置才生效**：Redis 直连（`REDIS_URL`）、MongoDB 事件存储（`MONGODB_URI`）、OpenAI / HuggingFace 模型（`OPENAI_API_KEY` / `HF_API_TOKEN`）、K8s 集群与镜像仓库、AWS Lambda 部署、Supabase Site URL（Google 登录）。
+- Docker / Kubernetes / Lambda 均已交付可用的编排配置与适配器，但**本机未安装 Docker / kubectl，集群部署未在本机实测**。
+- `NEXT_PUBLIC_*` 是构建期内联变量：Docker 通过 build args 注入、Vercel 通过项目环境变量注入，运行时修改不会生效。
+
 ## 测试与修复
 
 改完代码后按此顺序验证：
