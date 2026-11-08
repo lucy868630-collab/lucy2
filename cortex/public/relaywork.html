@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Relaywork — AI automations built and run for small teams</title>
+  <meta name="description" content="Relaywork designs, builds and runs AI automations for teams of 5–50. Tell us the bottleneck; we ship a working workflow, documented and handed over.">
+  <meta name="author" content="Relaywork">
+  <link rel="canonical" href="https://lucy2-jo6a.vercel.app/relaywork.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Relaywork — AI automations built and run for small teams">
+  <meta property="og:description" content="Stop doing the work a machine should be doing. We build the workflow, test it on your data, and hand over the keys.">
+  <meta property="og:url" content="https://lucy2-jo6a.vercel.app/relaywork.html">
+  <meta property="og:image" content="https://lucy2-jo6a.vercel.app/relaywork-og.svg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Relaywork — AI automations built and run for small teams">
+  <meta name="twitter:description" content="We build the workflow, test it on your data, and hand over the keys.">
+  <meta name="twitter:image" content="https://lucy2-jo6a.vercel.app/relaywork-og.svg">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236366F1'/%3E%3Cpath d='M9 21V11h7a4 4 0 010 8h-3l6 6' stroke='white' stroke-width='2.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            ink: { DEFAULT: '#070B18', soft: '#0E1530' },
+            brand: { DEFAULT: '#6366F1', light: '#A5B4FC', dark: '#4338CA' },
+            mint: { DEFAULT: '#34D399', dark: '#059669' }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root { --ring: #6366F1; --surface: #ffffff; --text: #0f172a; }
+    .dark { --ring: #A5B4FC; --surface: #0E1530; --text: #e2e8f0; }
+    .grid-bg {
+      background-image: linear-gradient(rgba(99,102,241,.10) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(99,102,241,.10) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 45%, transparent 100%);
+    }
+    .glow { background: radial-gradient(ellipse 60% 50% at 50% -10%, rgba(99,102,241,.35), transparent 70%); }
+    :focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+    input, textarea { color: var(--text); background: var(--surface); }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      { "@type": "Organization", "name": "Relaywork", "url": "https://lucy2-jo6a.vercel.app/relaywork.html", "email": "hello@relaywork.ai", "description": "AI automation studio for small teams" },
+      { "@type": "WebSite", "name": "Relaywork", "url": "https://lucy2-jo6a.vercel.app/relaywork.html" },
+      { "@type": "FAQPage", "mainEntity": [
+        { "@type": "Question", "name": "What exactly do you build?", "acceptedAnswer": { "@type": "Answer", "text": "Working automations against the tools you already use: inbox triage, quoting, reporting, data entry, follow-ups and internal handoffs. Each build ships with documentation and a handover session." } },
+        { "@type": "Question", "name": "Do I need technical staff?", "acceptedAnswer": { "@type": "Answer", "text": "No. You describe the process and give us access to the relevant tools. We handle the build, testing and documentation." } },
+        { "@type": "Question", "name": "How is pricing set?", "acceptedAnswer": { "@type": "Answer", "text": "Each engagement is quoted as a fixed scope after a short discovery call. You approve the scope before any build starts." } },
+        { "@type": "Question", "name": "What happens to our data?", "acceptedAnswer": { "@type": "Answer", "text": "We work with the minimum data needed to test the workflow. We do not use your data to train models, and you can revoke access at any time." } }
+      ]}
+    ]
+  }
+  </script>
+</head>
+<body class="bg-white dark:bg-ink text-slate-800 dark:text-slate-200 antialiased selection:bg-brand selection:text-white">
+
+  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-3 focus:left-3 focus:px-4 focus:py-2 focus:rounded-lg focus:bg-brand focus:text-white">Skip to content</a>
+
+  <header class="sticky top-0 z-40 border-b border-slate-200/70 dark:border-white/10 bg-white/85 dark:bg-ink/85 backdrop-blur">
+    <nav class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between gap-4" aria-label="Main navigation">
+      <a href="#top" class="flex items-center gap-2.5 font-bold text-lg tracking-tight text-slate-900 dark:text-white">
+        <span class="w-8 h-8 rounded-lg bg-brand text-white grid place-items-center text-sm font-black" aria-hidden="true">R</span>
+        Relaywork
+      </a>
+      <div class="hidden md:flex items-center gap-7 text-sm text-slate-600 dark:text-slate-300">
+        <a href="#services" class="hover:text-brand dark:hover:text-brand-light">What we do</a>
+        <a href="#how" class="hover:text-brand dark:hover:text-brand-light">How it works</a>
+        <a href="#faq" class="hover:text-brand dark:hover:text-brand-light">FAQ</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="theme-toggle" type="button" aria-label="Switch colour theme" class="w-9 h-9 rounded-lg border border-slate-200 dark:border-white/15 text-xs font-semibold hover:bg-slate-100 dark:hover:bg-white/10" title="Light / dark / system">AUTO</button>
+        <a href="#waitlist" class="rounded-lg bg-brand hover:bg-brand-dark text-white text-sm font-semibold px-4 py-2.5 shadow-sm shadow-brand/30">Join the waitlist</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section id="top" class="relative overflow-hidden">
+      <div class="absolute inset-0 glow" aria-hidden="true"></div>
+      <div class="absolute inset-0 grid-bg" aria-hidden="true"></div>
+      <div class="relative max-w-6xl mx-auto px-5 pt-20 pb-24 md:pt-28 md:pb-32">
+        <div class="grid lg:grid-cols-5 gap-12 items-center">
+          <div class="lg:col-span-3">
+            <p class="inline-flex items-center gap-2 text-xs font-semibold tracking-widest uppercase text-brand dark:text-brand-light mb-6">
+              <span class="w-2 h-2 rounded-full bg-mint animate-pulse" aria-hidden="true"></span>
+              AI automation studio · first cohort opening
+            </p>
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-[1.08] tracking-tight text-slate-900 dark:text-white">
+              Stop doing the work a <span class="text-brand dark:text-brand-light">machine</span> should be doing.
+            </h1>
+            <p class="mt-6 text-lg md:text-xl leading-relaxed text-slate-600 dark:text-slate-300 max-w-2xl">
+              Relaywork designs, builds and runs AI automations for teams of 5–50. You describe the bottleneck. We ship a working workflow — tested on your data, documented, and handed over with the keys.
+            </p>
+            <div class="mt-9 flex flex-col sm:flex-row gap-3">
+              <a href="#waitlist" class="inline-flex justify-center items-center rounded-xl bg-brand hover:bg-brand-dark text-white font-semibold px-7 py-4 shadow-lg shadow-brand/25">Join the waitlist</a>
+              <a href="#how" class="inline-flex justify-center items-center rounded-xl border border-slate-300 dark:border-white/20 hover:bg-slate-50 dark:hover:bg-white/5 font-semibold px-7 py-4">See how it works</a>
+            </div>
+            <p class="mt-5 text-sm text-slate-500 dark:text-slate-400">No sales call required to join. We email you when a slot opens.</p>
+          </div>
+          <div class="lg:col-span-2">
+            <div class="rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-ink-soft shadow-xl shadow-slate-900/5 p-6">
+              <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-5">A typical week, before → after</p>
+              <ul class="space-y-4 text-sm">
+                <li class="flex items-start gap-3"><span class="mt-1 w-5 h-5 shrink-0 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-300 grid place-items-center text-[11px] font-bold" aria-hidden="true">–</span><span><strong class="text-slate-900 dark:text-white">6 hrs</strong> copying figures between spreadsheets and reports</span></li>
+                <li class="flex items-start gap-3"><span class="mt-1 w-5 h-5 shrink-0 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-300 grid place-items-center text-[11px] font-bold" aria-hidden="true">–</span><span><strong class="text-slate-900 dark:text-white">Late follow-ups</strong> because nobody owned the inbox queue</span></li>
+                <li class="flex items-start gap-3"><span class="mt-1 w-5 h-5 shrink-0 rounded-full bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-300 grid place-items-center text-[11px] font-bold" aria-hidden="true">–</span><span><strong class="text-slate-900 dark:text-white">Quotes</strong> retyped by hand from three different sources</span></li>
+              </ul>
+              <div class="my-5 border-t border-dashed border-slate-200 dark:border-white/10"></div>
+              <ul class="space-y-4 text-sm">
+                <li class="flex items-start gap-3"><span class="mt-1 w-5 h-5 shrink-0 rounded-full bg-emerald-100 dark:bg-mint/20 text-mint-dark dark:text-mint grid place-items-center text-[11px] font-bold" aria-hidden="true">+</span><span>Reports assembled and sent before you open your laptop</span></li>
+                <li class="flex items-start gap-3"><span class="mt-1 w-5 h-5 shrink-0 rounded-full bg-emerald-100 dark:bg-mint/20 text-mint-dark dark:text-mint grid place-items-center text-[11px] font-bold" aria-hidden="true">+</span><span>Every lead acknowledged within minutes, with a human in the loop</span></li>
+                <li class="flex items-start gap-3"><span class="mt-1 w-5 h-5 shrink-0 rounded-full bg-emerald-100 dark:bg-mint/20 text-mint-dark dark:text-mint grid place-items-center text-[11px] font-bold" aria-hidden="true">+</span><span>Documentation your team actually owns</span></li>
+              </ul>
+              <p class="mt-6 text-xs text-slate-400">Illustrative workflow, not a customer result.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-label="Who this is for" class="border-y border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-ink-soft/60">
+      <div class="max-w-6xl mx-auto px-5 py-10">
+        <p class="text-center text-xs font-semibold uppercase tracking-widest text-slate-400 mb-6">Built for teams where the process lives in someone's head</p>
+        <div class="flex flex-wrap justify-center gap-3">
+          <span class="rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-ink px-4 py-2 text-sm">Small agencies & studios</span>
+          <span class="rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-ink px-4 py-2 text-sm">E-commerce operations</span>
+          <span class="rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-ink px-4 py-2 text-sm">Local service businesses</span>
+          <span class="rounded-full border border-slate-200 dark:border-white/10 bg-white dark:bg-ink px-4 py-2 text-sm">Finance & admin teams</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="max-w-6xl mx-auto px-5 py-20 md:py-24">
+      <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">You get a working system, not a slide deck.</h2>
+      <p class="mt-4 text-slate-600 dark:text-slate-300 max-w-2xl">Three things come with every engagement. No black box, no dependency on us to keep the lights on.</p>
+      <div class="mt-12 grid md:grid-cols-3 gap-6">
+        <article class="rounded-2xl border border-slate-200 dark:border-white/10 p-7 hover:border-brand/50 transition-colors">
+          <div class="w-11 h-11 rounded-xl bg-brand/10 text-brand dark:text-brand-light grid place-items-center mb-5" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h12M3 18h7"/><circle cx="19" cy="17" r="3"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Workflow teardown</h3>
+          <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">We map where your team actually loses hours — inbox triage, quoting, reporting, data entry, follow-ups — and pick the one bottleneck worth automating first.</p>
+        </article>
+        <article class="rounded-2xl border border-slate-200 dark:border-white/10 p-7 hover:border-brand/50 transition-colors">
+          <div class="w-11 h-11 rounded-xl bg-brand/10 text-brand dark:text-brand-light grid place-items-center mb-5" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><rect x="8" y="8" width="8" height="8" rx="2"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Build & ship</h3>
+          <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">We build against the tools you already use — email, spreadsheets, CRM, billing — and test it on your real data before anything goes live.</p>
+        </article>
+        <article class="rounded-2xl border border-slate-200 dark:border-white/10 p-7 hover:border-brand/50 transition-colors">
+          <div class="w-11 h-11 rounded-xl bg-brand/10 text-brand dark:text-brand-light grid place-items-center mb-5" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v12H4z"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M4 12h16"/></svg>
+          </div>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Handover & care</h3>
+          <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">You get the docs, the prompts, the access map and a handover session. When something breaks, there is a human who answers.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="how" class="border-y border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-ink-soft/60">
+      <div class="max-w-6xl mx-auto px-5 py-20 md:py-24">
+        <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">How it works</h2>
+        <div class="mt-12 grid md:grid-cols-3 gap-8">
+          <div><span class="text-sm font-bold text-brand dark:text-brand-light">01</span><h3 class="mt-3 text-lg font-semibold text-slate-900 dark:text-white">Tell us the bottleneck</h3><p class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">A short form: what takes the time, which tools are involved, what "done" looks like.</p></div>
+          <div><span class="text-sm font-bold text-brand dark:text-brand-light">02</span><h3 class="mt-3 text-lg font-semibold text-slate-900 dark:text-white">Approve a fixed scope</h3><p class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">We send a plain-language build plan with the price and the boundary. Nothing starts until you say go.</p></div>
+          <div><span class="text-sm font-bold text-brand dark:text-brand-light">03</span><h3 class="mt-3 text-lg font-semibold text-slate-900 dark:text-white">We ship, you keep it</h3><p class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">Built, tested, documented, handed over. You own the accounts and the code.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="waitlist" class="max-w-6xl mx-auto px-5 py-20 md:py-24">
+      <div class="rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-ink-soft shadow-xl shadow-slate-900/5">
+        <div class="grid lg:grid-cols-2">
+          <div class="p-8 md:p-12 bg-gradient-to-br from-brand to-brand-dark text-white">
+            <p class="text-xs font-semibold uppercase tracking-widest text-white/70">Founding cohort</p>
+            <h2 class="mt-4 text-3xl md:text-4xl font-bold tracking-tight">Be first in line.</h2>
+            <p class="mt-4 leading-relaxed text-white/85">We are onboarding a small first group so we can do the work properly. Join the waitlist and tell us the one process you would hand off tomorrow.</p>
+            <ul class="mt-8 space-y-3 text-sm text-white/90">
+              <li class="flex gap-3"><span aria-hidden="true">→</span> Early access to discovery slots</li>
+              <li class="flex gap-3"><span aria-hidden="true">→</span> Founding-cohort pricing, locked in writing</li>
+              <li class="flex gap-3"><span aria-hidden="true">→</span> A free 20-minute workflow teardown</li>
+            </ul>
+            <p class="mt-10 text-xs text-white/60">No spam. One email when a slot opens, and you can ask us to delete your details at any time.</p>
+          </div>
+          <div class="p-8 md:p-12">
+            <form id="waitlist-form" novalidate>
+              <label for="email" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Work email <span class="text-rose-500" aria-hidden="true">*</span></label>
+              <input id="email" name="email" type="email" required autocomplete="email" placeholder="you@company.com" class="mt-2 w-full rounded-xl border border-slate-300 dark:border-white/15 px-4 py-3 text-sm placeholder:text-slate-400">
+              <div class="mt-5 grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="company" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Company <span class="text-slate-400 font-normal">(optional)</span></label>
+                  <input id="company" name="company" type="text" maxlength="120" placeholder="Acme Ltd" class="mt-2 w-full rounded-xl border border-slate-300 dark:border-white/15 px-4 py-3 text-sm placeholder:text-slate-400">
+                </div>
+                <div>
+                  <label for="role" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Your role <span class="text-slate-400 font-normal">(optional)</span></label>
+                  <input id="role" name="role" type="text" maxlength="120" placeholder="Operations lead" class="mt-2 w-full rounded-xl border border-slate-300 dark:border-white/15 px-4 py-3 text-sm placeholder:text-slate-400">
+                </div>
+              </div>
+              <label for="note" class="block mt-5 text-sm font-medium text-slate-700 dark:text-slate-200">What would you automate first?</label>
+              <textarea id="note" name="note" rows="3" maxlength="1000" placeholder="e.g. We retype supplier quotes into three spreadsheets every Monday." class="mt-2 w-full rounded-xl border border-slate-300 dark:border-white/15 px-4 py-3 text-sm placeholder:text-slate-400"></textarea>
+              <button id="submit-btn" type="submit" class="mt-6 w-full rounded-xl bg-slate-900 dark:bg-mint hover:opacity-90 text-white dark:text-ink font-semibold px-6 py-4 disabled:opacity-60">Join the waitlist</button>
+              <p id="form-msg" role="status" aria-live="polite" class="mt-4 text-sm hidden"></p>
+              <p class="mt-4 text-xs text-slate-400">By joining you agree to the handling described in our <a href="#privacy" class="underline hover:text-brand">privacy note</a>.</p>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="border-t border-slate-200 dark:border-white/10">
+      <div class="max-w-3xl mx-auto px-5 py-20">
+        <h2 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Questions, answered</h2>
+        <div class="mt-8 space-y-3">
+          <details class="group rounded-xl border border-slate-200 dark:border-white/10 px-5 py-4"><summary class="cursor-pointer font-medium text-slate-900 dark:text-white">What exactly do you build?</summary><p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">Working automations against the tools you already use: inbox triage, quoting, reporting, data entry, follow-ups and internal handoffs. Each build ships with documentation and a handover session.</p></details>
+          <details class="group rounded-xl border border-slate-200 dark:border-white/10 px-5 py-4"><summary class="cursor-pointer font-medium text-slate-900 dark:text-white">Do I need technical staff?</summary><p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">No. You describe the process and grant access to the relevant tools. We handle the build, testing and documentation.</p></details>
+          <details class="group rounded-xl border border-slate-200 dark:border-white/10 px-5 py-4"><summary class="cursor-pointer font-medium text-slate-900 dark:text-white">How is pricing set?</summary><p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">Each engagement is quoted as a fixed scope after a short discovery call. You approve the scope before any build starts.</p></details>
+          <details class="group rounded-xl border border-slate-200 dark:border-white/10 px-5 py-4"><summary class="cursor-pointer font-medium text-slate-900 dark:text-white">What happens to our data?</summary><p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">We work with the minimum data needed to test the workflow. We do not use your data to train models, and you can revoke access at any time.</p></details>
+          <details class="group rounded-xl border border-slate-200 dark:border-white/10 px-5 py-4"><summary class="cursor-pointer font-medium text-slate-900 dark:text-white">When do you start?</summary><p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">We are opening the first cohort in small batches. Waitlist members are contacted in the order they joined.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section id="privacy" class="border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-ink-soft/60">
+      <div class="max-w-3xl mx-auto px-5 py-12">
+        <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Privacy note</h2>
+        <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">We store the email and optional details you submit so we can contact you about early access. We do not sell or share them, and we do not use them for advertising. Ask us at <a href="mailto:hello@relaywork.ai" class="text-brand dark:text-brand-light underline">hello@relaywork.ai</a> to see or delete your details at any time. Replace this note with a full privacy policy and a registered business address before running paid acquisition.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-slate-200 dark:border-white/10">
+    <div class="max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row justify-between gap-6 text-sm text-slate-500 dark:text-slate-400">
+      <div>
+        <p class="font-semibold text-slate-900 dark:text-white">Relaywork</p>
+        <p class="mt-1">AI automation, done for you.</p>
+        <p class="mt-3"><a href="mailto:hello@relaywork.ai" class="hover:text-brand">hello@relaywork.ai</a></p>
+      </div>
+      <div class="flex flex-col sm:items-end gap-2">
+        <a href="#privacy" class="hover:text-brand">Privacy note</a>
+        <a href="#services" class="hover:text-brand">What we do</a>
+        <a href="#waitlist" class="hover:text-brand">Join the waitlist</a>
+        <p class="mt-2 text-xs">© <span id="year">2026</span> Relaywork. Replace with your registered entity name.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var KEY = 'relaywork-theme';
+      var btn = document.getElementById('theme-toggle');
+      var modes = ['system', 'light', 'dark'];
+      function apply(mode) {
+        var dark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('dark', dark);
+        btn.textContent = mode === 'system' ? 'AUTO' : mode === 'light' ? 'LIGHT' : 'DARK';
+        btn.setAttribute('aria-label', 'Colour theme: ' + mode + '. Click to change.');
+      }
+      var stored = localStorage.getItem(KEY) || 'system';
+      apply(stored);
+      btn.addEventListener('click', function () {
+        var next = modes[(modes.indexOf(stored) + 1) % modes.length];
+        stored = next;
+        localStorage.setItem(KEY, next);
+        apply(next);
+      });
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+        if (stored === 'system') apply('system');
+      });
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      var form = document.getElementById('waitlist-form');
+      var msg = document.getElementById('form-msg');
+      var submit = document.getElementById('submit-btn');
+      function show(text, kind) {
+        msg.textContent = text;
+        msg.className = 'mt-4 text-sm rounded-lg px-4 py-3 ' + (
+          kind === 'ok' ? 'bg-emerald-50 dark:bg-mint/10 text-emerald-700 dark:text-mint' :
+          'bg-amber-50 dark:bg-amber-400/10 text-amber-800 dark:text-amber-300'
+        );
+      }
+      function demoMode(email) {
+        var list = JSON.parse(localStorage.getItem('relaywork-demo-waitlist') || '[]');
+        if (list.indexOf(email) === -1) list.push(email);
+        localStorage.setItem('relaywork-demo-waitlist', JSON.stringify(list));
+        show('Demo mode: the waitlist backend is not connected yet, so this address was NOT sent to us. It is saved only in this browser.', 'warn');
+      }
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        var email = String(form.email.value || '').trim().toLowerCase();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          show('Please enter a valid email address.', 'warn');
+          form.email.focus();
+          return;
+        }
+        if (location.protocol === 'file:') { demoMode(email); return; }
+        submit.disabled = true;
+        submit.textContent = 'Sending…';
+        try {
+          var res = await fetch('/api/waitlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: email,
+              company: String(form.company.value || '').slice(0, 120),
+              role: String(form.role.value || '').slice(0, 120),
+              note: String(form.note.value || '').slice(0, 1000),
+              source: 'relaywork-landing'
+            })
+          });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          form.reset();
+          show('You are on the list. We will email ' + email + ' when a slot opens.', 'ok');
+        } catch (err) {
+          demoMode(email);
+        } finally {
+          submit.disabled = false;
+          submit.textContent = 'Join the waitlist';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

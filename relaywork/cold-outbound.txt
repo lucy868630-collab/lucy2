@@ -1,0 +1,128 @@
+RELAYWORK — COLD OUTBOUND KIT
+===============================
+Templates only. No contact list is included. Fill in the bracketed fields yourself
+from legitimate, public B2B sources, and read the compliance section first.
+
+
+BEFORE YOU SEND ANYTHING
+------------------------
+1. Use real identity: your name, your company, a physical postal address, and a
+   working reply-to. Never spoof a domain or imply an existing relationship.
+2. Every email needs a clear one-click unsubscribe and an honest subject line.
+   Honour opt-outs immediately. CAN-SPAM (US), GDPR/PECR (EU/UK), and local
+   rules where you operate all apply; this kit is not legal advice.
+3. Only contact business addresses in a B2B context. Do not scrape personal
+   email addresses, phone numbers, or private profiles. Do not buy lists of
+   unknown origin. Prefer a company's published contact page, a public team
+   page, or an opt-in industry directory.
+4. Cold calling / auto-dialling / recording have their own rules (e.g. TCPA in
+   the US). Check local law, do not auto-dial, and never record without consent.
+5. Keep volume low and human. Personalise the first line from something actually
+   true about their business. Generic blasts burn the domain and the brand.
+6. Do not claim customers, results, or numbers you do not have. Relaywork is a
+   new business; say so.
+
+
+WHO TO LOOK FOR (define the segment, then source it legitimately)
+-----------------------------------------------------------------
+- Owner / ops lead / finance lead at a 5-50 person agency, e-commerce operator,
+  or local service business.
+- Trigger signals: hiring for admin roles, "we're swamped" posts, manual
+  spreadsheet jobs visible in job ads, repetitive quoting described on their site.
+- One named human per company. No catch-all blasts to info@ / sales@.
+
+
+EMAIL 1 — DAY 1
+---------------
+Subject: [Company]'s [SpecificPain] — worth 15 minutes?
+
+Hi [FirstName],
+
+I noticed [one specific, true observation about their business — e.g. your team
+posts job ads for a data-entry role twice a year].
+
+I'm [YourName] from Relaywork. We're a small studio that builds AI automations
+for teams your size — the boring, repetitive handoffs between email,
+spreadsheets and your CRM. We're new, so we're opening a small founding cohort
+and doing the first workflow teardowns at no charge.
+
+Is [SpecificPain] something your team still does by hand? If yes, I can send a
+one-page outline of how we'd automate it — no call needed. If not, I'll leave
+you alone.
+
+[YourName]
+Relaywork | [YourBusinessAddress]
+Reply "no thanks" and I won't follow up. [UnsubscribeLink]
+
+
+EMAIL 2 — DAY 4 (only if no reply)
+----------------------------------
+Subject: Re: [Company]'s [SpecificPain]
+
+Hi [FirstName],
+
+Short follow-up. The teardown I mentioned is a 20-minute screen-share: you walk
+me through [SpecificPain], I mark where the hours go, and you keep the notes
+whether or not we ever work together.
+
+Useful, or should I close the loop?
+
+[YourName]
+Relaywork | [YourBusinessAddress]
+[UnsubscribeLink]
+
+
+EMAIL 3 — DAY 9 (final; then stop)
+----------------------------------
+Subject: Closing the loop
+
+Hi [FirstName],
+
+I'll stop here so I don't clutter your inbox. If [SpecificPain] is still on the
+list next quarter, the waitlist is at [LandingPageURL] and my reply-to works.
+
+All the best,
+[YourName]
+Relaywork | [YourBusinessAddress]
+[UnsubscribeLink]
+
+
+PHONE / VOICEMAIL (30 seconds)
+------------------------------
+"Hi [FirstName], this is [YourName] with Relaywork — I know this is out of the
+blue, is now a terrible time? [pause / respect the answer]
+
+[If yes, bad time]: No problem, when's better? Thanks, I'll call then.
+
+[If no]: Thanks. I sent a short note about [SpecificPain]. We're a new studio
+that builds AI automations for small teams, and I'm doing a handful of free
+20-minute workflow teardowns. No pitch deck — I just want to see whether the
+bottleneck is real. Would [Day] at [Time] work?"
+
+Voicemail: "Hi [FirstName], [YourName] at Relaywork, [PhoneNumber]. I sent a
+note about [SpecificPain] — no need to call back unless it's useful. Thanks."
+
+
+REPLY HANDLING
+--------------
+Interested     -> "Great. Here's a 3-question form (5 min) and two slots. I'll
+                  send a fixed scope and price before anything starts."
+Not interested -> "Understood, thanks for the straight answer. I won't follow up."
+                  Then actually stop and add to your suppression list.
+Referral       -> "Thanks — happy to be introduced. I'll only reach out once."
+Question about price -> Give a range with the assumptions, not a vague "let's
+                  talk". A fixed scope after discovery is the offer.
+
+
+WHAT TO TRACK (a spreadsheet is enough at this stage)
+-----------------------------------------------------
+Contacted / Replied / Interested / Teardown booked / Scope sent / Won.
+Watch reply rate per 100 sends. If it is under ~3%, the problem is the segment
+or the offer — not the copy. Fix that before increasing volume.
+
+
+WHAT THIS KIT DOES NOT DO
+-------------------------
+It does not find or harvest anyone's contact details, send emails, place calls,
+or book meetings on your behalf. Those steps need your judgement, your sending
+domain, and your compliance review.
