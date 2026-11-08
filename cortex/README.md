@@ -252,6 +252,15 @@ Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态�
 
 也可通过 IDE 的部署集成（CloudBase / EdgeOne Makers / Cloud Studio）发布；选择支持 **Node 服务端运行** 的方案，不要选纯静态托管。**当前 IDE 里的部署集成处于未连接状态**，需先在集成面板完成连接，才能由工具直接发布并拿到公网 URL。
 
+### Waitlist 上线前置（容易踩的坑）
+
+`cortex/waitlist_schema.sql` 必须在**与 `NEXT_PUBLIC_SUPABASE_URL` 指向的同一个 Supabase 项目**里，用 SQL Editor 整体执行一次。跑在账号下的另一个项目里不会生效——两个项目 ID 不同，anon key 也不通用。
+
+- 核对方式：Supabase → Settings → API → Project URL，应与环境变量里的域名完全一致（**不含** `/rest/v1/`）。
+- `/api/ready` 的 `postgres: ok` 只说明 URL 与 anon key 已配置，**不检测 `public.waitlist` 是否存在**。表缺失时 `/api/waitlist` 返回 502，Supabase 原始报错为 `PGRST205: Could not find the table 'public.waitlist' in the schema cache`。
+- 脚本末尾的 `notify pgrst, 'reload schema';` 会立刻刷新 PostgREST schema cache；脚本幂等，可重复执行。
+- 权限设计：`anon` 只有 `insert`、没有 `select`，名单在 Supabase 控制台查看。
+
 ### 交付验收清单
 
 - [x] `npm run build` 通过，无报错
@@ -267,6 +276,7 @@ Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态�
 - [x] 线上注册 + 带 token 调 AI 画像接口返回 200
 - [ ] Supabase Site URL / Redirect URLs 指向该域名（可选，仅影响 Google 登录 / 邮件确认）
 - [x] 线上端到端验收：注册 → 上传写入（含异常日期 201/400 对照）→ 双语 AI 画像 / 报告 → 测试数据清理
+- [ ] Waitlist 建表已在**正确项目**执行：`/api/waitlist` 真实入库 200、anon 读不到名单、测试数据已清理
 
 ## React Native / Expo → iOS（了解路径，尚未实施）
 

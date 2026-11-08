@@ -47,6 +47,11 @@ export const POST = handle(async (req, { requestId, log }) => {
 
   if (!res.ok) {
     const detail = (await res.text().catch(() => "")).slice(0, 200);
+    if (detail.includes("PGRST205")) {
+      throw new UpstreamError("候补名单表未就绪", {
+        detail: "Supabase 返回 PGRST205：public.waitlist 不存在。请在应用所连接的 Supabase 项目（与 NEXT_PUBLIC_SUPABASE_URL 同一个）的 SQL Editor 执行 waitlist_schema.sql；若在另一个项目里跑过，需切换项目重跑。",
+      });
+    }
     throw new UpstreamError("提交失败（" + res.status + "）", { detail });
   }
 
