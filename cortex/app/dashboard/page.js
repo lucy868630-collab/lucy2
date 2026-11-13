@@ -7,6 +7,7 @@ import { Chart } from "chart.js/auto";
 import { T } from "../../lib/i18n";
 import { buildSmartView } from "../../lib/smart";
 import { normDate } from "../../lib/date";
+import ChurnPanel from "./ChurnPanel";
 import { supabase, supabaseConfigured } from "../../lib/supabaseClient";
 
 const SAMPLE_AGG = {
@@ -108,6 +109,7 @@ export default function DashboardPage() {
   const [mapping, setMapping] = useState(null);   // {fields, rows}
   const [mapSel, setMapSel] = useState({});
   const [smart, setSmart] = useState(null);       // AI 数据画像 + 动态视图
+  const [rawRows, setRawRows] = useState(null);   // 当前账户原始订单行，供流失风险计算
   const [profileBusy, setProfileBusy] = useState(false);
   const [busyUpload, setBusyUpload] = useState(false);
   const [report, setReport] = useState("");
@@ -133,6 +135,7 @@ export default function DashboardPage() {
           const view = buildSmartView(saved.rows, saved.profile);
           setSmart(view);
           setAgg(view.agg);
+          setRawRows(saved.rows);
         }
       } catch {}
     };
@@ -157,6 +160,7 @@ export default function DashboardPage() {
       const a = aggregateRows(data);
       a.meta = { rows: data.length, customers: new Set(data.map((r) => r.customer_id)).size };
       setAgg(a);
+      setRawRows(data);
     }
   }
 
@@ -338,6 +342,7 @@ export default function DashboardPage() {
     try { localStorage.removeItem("cortex_dataset"); } catch {}
     setSmart(null);
     setAgg(SAMPLE_AGG);
+    setRawRows(null);
     if (user) loadOrders(user.id);
   }
 
@@ -486,6 +491,7 @@ export default function DashboardPage() {
         <div className="side-brand"><div className="logo-dot"></div><div><b>{t.brand}</b><small>{t.brandSub}</small></div></div>
         <div className="nav-group">{t.groupData}</div>
         <div className="nav-item active" onClick={() => nav("sec-top")}>◼ {t.navOverview}</div>
+        <div className="nav-item" onClick={() => nav("sec-churn")}>◈ {t.churnNav}</div>
         <div className="nav-item" onClick={() => nav("sec-report")}>✦ {t.navReport}</div>
         <div className="nav-group">{t.groupWorkspace}</div>
         <div className="nav-item" onClick={() => nav("sec-upload")}>↥ {t.navUpload}</div>
@@ -605,6 +611,8 @@ export default function DashboardPage() {
             </>
           )}
         </div>
+
+        <ChurnPanel rawRows={rawRows} lang={lang} t={t} />
 
         <div className="cards">
           <div className="card"><div className="card-head"><h3>{cht.monthly}</h3><span>{sub(t.chMonthlySub)}</span></div><div className="chart-box"><canvas id="chMonthly"></canvas></div></div>

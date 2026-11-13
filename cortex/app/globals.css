@@ -130,6 +130,31 @@ th.num{text-align:right}
 .pill{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
 .pill.error{background:rgba(255,92,122,.2);color:var(--red)}
 .pill.success{background:rgba(46,204,143,.2);color:var(--green)}
+
+/* 客户流失风险预警 */
+.churn-bands{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
+.churn-band{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--border);border-radius:var(--radius);padding:16px 18px}
+.churn-band.high{border-left-color:var(--red)}
+.churn-band.mid{border-left-color:#ffb84f}
+.churn-band.low{border-left-color:var(--green)}
+.churn-band.trend{border-left-color:var(--accent2)}
+.churn-band .label{font-size:12px;color:var(--muted);margin-bottom:8px}
+.churn-band .value{font-size:24px;font-weight:700}
+.churn-band .delta{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5}
+.churn-band.high .value{color:var(--red)}
+.churn-band.mid .value{color:#ffb84f}
+.churn-band.low .value{color:var(--green)}
+.churn-list{max-height:300px;overflow-y:auto}
+.churn-list table{width:100%;border-collapse:collapse;font-size:12px}
+.churn-list th{color:var(--muted);font-weight:600;text-align:left;padding:8px 6px;border-bottom:1px solid var(--border)}
+.churn-list td{padding:8px 6px;border-bottom:1px solid var(--border);vertical-align:top}
+.churn-list .num{text-align:right}
+.churn-tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;border:1px solid var(--border)}
+.churn-tag.high{color:var(--red);border-color:var(--red)}
+.churn-tag.mid{color:#ffb84f;border-color:#ffb84f}
+.churn-note{font-size:12px;color:var(--muted);line-height:1.8;margin-top:14px}
+.churn-sample{background:rgba(255,184,79,.1);border:1px solid rgba(255,184,79,.4);color:#ffb84f;border-radius:10px;padding:10px 14px;font-size:12px;line-height:1.7;margin-bottom:16px}
+@media(max-width:960px){.churn-bands{grid-template-columns:repeat(2,1fr)}}
 .skel-line{height:12px;border-radius:6px;background:linear-gradient(90deg,var(--panel2),#1e2739,var(--panel2));background-size:200% 100%;animation:shimmer 1.4s infinite;margin:10px 0}
 .skel-line.short{width:55%}
 .skeleton{background:linear-gradient(90deg,var(--panel2),#1e2739,var(--panel2));background-size:200% 100%;animation:shimmer 1.4s infinite;border-color:transparent}
