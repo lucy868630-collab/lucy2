@@ -57,6 +57,9 @@ export const config = {
   api: {
     baseUrl: read("NEXT_PUBLIC_API_URL", "http://localhost:3000"),
   },
+  site: {
+    contactEmail: read("SITE_CONTACT_EMAIL", "lucy868630@gmail.com"),
+  },
   mail: {
     resendKey,
     from: mailFrom,

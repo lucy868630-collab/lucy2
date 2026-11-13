@@ -1,27 +1,27 @@
 import { config } from "./config.js";
 
-/** 事务性确认邮件文案。不发营销内容，不承诺名额时间。 */
+/** 事务性确认邮件文案。不发营销内容，不承诺名额时间，移除渠道用真实联系邮箱。 */
 const COPY = {
   zh: {
     subject: "Relaywork — 已收到你的候补名单申请",
-    text: (email) => [
+    text: (email, contact) => [
       "你好，",
       "",
       `我们已收到 ${email} 提交的 Relaywork 候补名单申请。这是一封确认邮件，不是营销邮件。`,
       "名额开放时我们会用这个邮箱联系你；在此之前不会发送推广内容，也不会出售或共享你的信息。",
-      "如果这不是你提交的，或希望从名单中移除，直接回复本邮件说明即可。",
+      `如果这不是你提交的，或希望从名单中移除，直接回复本邮件，或发到 ${contact}。`,
       "",
       "Relaywork",
     ].join("\n"),
   },
   en: {
     subject: "Relaywork — you're on the waitlist",
-    text: (email) => [
+    text: (email, contact) => [
       "Hi,",
       "",
       `We received a Relaywork waitlist signup from ${email}. This is a confirmation, not a marketing email.`,
       "We will use this address to contact you when a spot opens. Until then we will not send promotional content, and we do not sell or share your details.",
-      "If this was not you, or you would like to be removed from the list, simply reply to this email.",
+      `If this was not you, or you would like to be removed from the list, reply to this email or write to ${contact}.`,
       "",
       "Relaywork",
     ].join("\n"),
@@ -57,7 +57,7 @@ export async function sendWaitlistConfirmation({ email, lang = "zh", log }) {
         to: [email],
         ...(config.mail.replyTo ? { reply_to: config.mail.replyTo } : {}),
         subject: copy.subject,
-        text: copy.text(email),
+        text: copy.text(email, config.site.contactEmail),
       }),
       signal: AbortSignal.timeout(config.mail.timeoutMs),
     });

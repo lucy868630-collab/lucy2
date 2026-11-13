@@ -75,6 +75,16 @@ test("waitlist 提交不依赖 anon 的 SELECT 权限", () => {
   assert.ok(src.includes("23505"), "重复邮箱需按 409 幂等处理");
 });
 
+test("落地页与确认邮件使用真实联系邮箱，无占位地址残留", () => {
+  const html = read("public/relaywork.html");
+  const notify = read("src/shared/notify.js");
+  const cfg = read("src/shared/config.js");
+  assert.ok(html.includes("mailto:lucy868630@gmail.com"));
+  assert.ok(!html.includes("hello@relaywork.ai"));
+  assert.ok(cfg.includes("SITE_CONTACT_EMAIL"));
+  assert.ok(notify.includes("config.site.contactEmail"));
+});
+
 test("自检端点把权限拒绝判为健康，只有无效密钥才算错配", () => {
   const src = read("app/api/waitlist/status/route.js");
   assert.ok(src.includes("42501"));
