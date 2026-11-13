@@ -274,6 +274,13 @@ Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态�
 - **名单后台**：`GET /api/waitlist/admin`（`Authorization: Bearer <WAITLIST_ADMIN_TOKEN>`）读取名单，管理页在 `/waitlist-admin`。`WAITLIST_ADMIN_TOKEN` 与 `SUPABASE_SERVICE_ROLE_KEY` **两项都填**才启用，缺任一项直接拒绝，绝不回退到匿名读取；凭证用常量时间比较并受限流保护，token 只存在浏览器 `sessionStorage`。service_role 是高权限密钥，只放服务端环境变量，绝不加 `NEXT_PUBLIC_` 前缀。
 - **不配置也能用**：名单始终可在 Supabase 控制台查看，管理页会明确提示未配置，而不是假装成功。
 
+### 冷启动执行看板
+
+`https://lucy2-jo6a.vercel.app/pipeline.html`（内部工具，已设 `noindex`），配合 `relaywork/cold-outbound.txt` 使用。记录目标公司、联系人、渠道、状态、下一步与备注，带 7 天未跟进提醒、中英双语、亮暗主题、CSV 导入导出。状态流：待联系 → 已联系 → 已回复 → 已预约 → 成交 / 暂缓。
+
+- 数据只存在浏览器 `localStorage`，不上传、无外部请求、**不代找联系人、不代发邮件、不代外呼**。清除浏览器数据会丢失，重要记录请定期导出 CSV。
+- 外联仍需人工、低量、个性化执行，并遵守 CAN-SPAM / GDPR / PECR / TCPA 与当地法规；工具里的联系人信息由使用者自行依法获取。
+
 ### 交付验收清单
 
 - [x] `npm run build` 通过，无报错

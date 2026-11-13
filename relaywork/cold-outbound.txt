@@ -3,6 +3,10 @@ RELAYWORK — COLD OUTBOUND KIT
 Templates only. No contact list is included. Fill in the bracketed fields yourself
 from legitimate, public B2B sources, and read the compliance section first.
 
+Optional tracker: https://lucy2-jo6a.vercel.app/pipeline.html
+Local-only and bilingual, with status tracking and CSV import/export. Nothing is
+uploaded; neither this kit nor the tracker finds contacts or sends anything for you.
+
 
 BEFORE YOU SEND ANYTHING
 ------------------------

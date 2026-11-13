@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Relaywork · 外联追踪</title>
+  <style>
+    :root {
+      --bg: #f6f7fb; --panel: #ffffff; --panel2: #f1f4fa; --text: #0f172a;
+      --muted: #64748b; --border: #e2e8f0; --brand: #4f46e5; --brand-soft: #eef2ff;
+      --ok: #059669; --warn: #b45309; --danger: #dc2626;
+    }
+    html[data-theme="dark"] {
+      --bg: #070b18; --panel: #111827; --panel2: #0b1220; --text: #e2e8f0;
+      --muted: #94a3b8; --border: #1f2937; --brand: #818cf8; --brand-soft: #1e1b4b;
+      --ok: #34d399; --warn: #fbbf24; --danger: #f87171;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif; font-size: 14px; line-height: 1.6; }
+    a { color: var(--brand); }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px 48px; }
+    header { border-bottom: 1px solid var(--border); background: var(--panel); }
+    .head-in { max-width: 1180px; margin: 0 auto; padding: 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; }
+    .logo i { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 9px; background: #6366F1; color: #fff; font-style: normal; }
+    .head-sub { color: var(--muted); font-size: 12px; }
+    .head-actions { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; border-radius: 9px; padding: 8px 14px; border: 1px solid var(--border); background: var(--panel2); color: var(--text); }
+    button:hover { border-color: var(--brand); }
+    button.primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+    button.ghost { background: transparent; }
+    button.danger { color: var(--danger); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .notice { margin: 20px 0; padding: 14px 18px; border-radius: 12px; background: var(--brand-soft); border: 1px solid var(--border); }
+    .notice b { display: block; margin-bottom: 4px; }
+    .notice p { margin: 0; color: var(--muted); font-size: 13px; }
+    .stats { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); margin-bottom: 18px; }
+    .stat { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+    .stat span { display: block; color: var(--muted); font-size: 12px; }
+    .stat strong { font-size: 22px; }
+    .stat.stale strong { color: var(--warn); }
+    .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+    input, select, textarea { background: var(--panel2); color: var(--text); border: 1px solid var(--border); border-radius: 9px; padding: 9px 11px; }
+    .toolbar input[type=search] { flex: 1 1 220px; min-width: 180px; }
+    .table-wrap { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 860px; }
+    th, td { padding: 11px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { color: var(--muted); font-size: 12px; font-weight: 600; white-space: nowrap; }
+    tbody tr:last-child td { border-bottom: none; }
+    .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; background: var(--panel2); border: 1px solid var(--border); white-space: nowrap; }
+    .pill.won { color: var(--ok); border-color: var(--ok); }
+    .pill.lost { color: var(--muted); }
+    .pill.stale { color: var(--warn); border-color: var(--warn); }
+    .row-actions { white-space: nowrap; }
+    .row-actions button { padding: 4px 9px; font-size: 12px; }
+    .empty { padding: 40px 16px; text-align: center; color: var(--muted); }
+    footer { color: var(--muted); font-size: 12px; margin-top: 18px; text-align: center; }
+    .overlay { position: fixed; inset: 0; background: rgba(3, 7, 18, .72); display: none; place-items: center; padding: 16px; z-index: 20; }
+    .overlay.open { display: grid; }
+    .modal { width: min(560px, 100%); max-height: 90vh; overflow-y: auto; background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
+    .modal h2 { margin: 0 0 16px; font-size: 18px; }
+    .fields { display: grid; gap: 12px; }
+    .fields label { display: grid; gap: 5px; font-size: 13px; color: var(--muted); }
+    .fields textarea { min-height: 76px; resize: vertical; }
+    .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 18px; }
+    .msg { font-size: 13px; color: var(--brand); min-height: 20px; margin: 10px 0 0; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="head-in">
+    <div class="logo"><i>R</i><span>Relaywork</span></div>
+    <span class="head-sub" data-i18n="page.sub">外联追踪</span>
+    <div class="head-actions">
+      <a href="/relaywork.html" class="head-sub" data-i18n="nav.back">返回落地页</a>
+      <button type="button" id="theme-btn" class="ghost" data-i18n="nav.theme">亮色</button>
+      <button type="button" id="lang-btn" class="ghost">EN</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="notice">
+    <b data-i18n="notice.title">只用本机，不代你外联</b>
+    <p data-i18n="notice.body">所有记录只保存在当前浏览器的 localStorage，不会上传，也不会替你查找联系人、发邮件或打电话。请人工、低量、个性化地做外联，并遵守 CAN-SPAM / GDPR / PECR / TCPA 与当地法规。</p>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="toolbar">
+    <input type="search" id="q" data-i18n-ph="toolbar.searchPh" aria-label="Search">
+    <select id="filter"></select>
+    <button type="button" id="add-btn" class="primary" data-i18n="toolbar.add">新增</button>
+    <button type="button" id="import-btn" data-i18n="toolbar.import">导入 CSV</button>
+    <button type="button" id="export-btn" data-i18n="toolbar.export">导出 CSV</button>
+    <input type="file" id="file" accept=".csv,text/csv" hidden>
+  </div>
+
+  <p class="msg" id="msg" role="status"></p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr id="thead"></tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="empty" data-i18n="table.empty">还没有记录。点「新增」开始，或用「导入 CSV」把已有名单带进来。</div>
+  </div>
+
+  <footer data-i18n="footer.text">数据仅存本浏览器 · 清除浏览器数据会一并删除，重要记录请定期导出 CSV</footer>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h2 id="form-title" data-i18n="form.new">新增线索</h2>
+    <div class="fields">
+      <label><span data-i18n="form.company">公司 / 组织</span><input id="f-company" maxlength="120"></label>
+      <label><span data-i18n="form.contact">联系人</span><input id="f-contact" maxlength="120"></label>
+      <label><span data-i18n="form.channel">渠道</span><select id="f-channel"></select></label>
+      <label><span data-i18n="form.status">状态</span><select id="f-status"></select></label>
+      <label><span data-i18n="form.next">下一步</span><input id="f-next" maxlength="200"></label>
+      <label><span data-i18n="form.note">备注</span><textarea id="f-note" maxlength="1000"></textarea></label>
+    </div>
+    <div class="modal-actions">
+      <button type="button" id="cancel-btn" data-i18n="form.cancel">取消</button>
+      <button type="button" id="save-btn" class="primary" data-i18n="form.save">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* I18N_DICT_START */
+  var I18N = {
+    zh: {
+      'meta.title': 'Relaywork · 外联追踪',
+      'brand': 'Relaywork',
+      'page.sub': '外联追踪',
+      'nav.back': '返回落地页',
+      'nav.lang': '切换到英文',
+      'nav.theme': '亮色',
+      'notice.title': '只用本机，不代你外联',
+      'notice.body': '所有记录只保存在当前浏览器的 localStorage，不会上传，也不会替你查找联系人、发邮件或打电话。请人工、低量、个性化地做外联，并遵守 CAN-SPAM / GDPR / PECR / TCPA 与当地法规。',
+      'stats.total': '总线索',
+      'stats.stale': '超过 7 天未跟进',
+      'status.new': '待联系',
+      'status.contacted': '已联系',
+      'status.replied': '已回复',
+      'status.meeting': '已预约',
+      'status.won': '成交',
+      'status.lost': '暂缓',
+      'toolbar.search': '搜索',
+      'toolbar.searchPh': '搜索公司、联系人或备注',
+      'toolbar.all': '全部状态',
+      'toolbar.add': '新增',
+      'toolbar.import': '导入 CSV',
+      'toolbar.export': '导出 CSV',
+      'table.company': '公司 / 组织',
+      'table.contact': '联系人',
+      'table.channel': '渠道',
+      'table.status': '状态',
+      'table.next': '下一步',
+      'table.updated': '更新于',
+      'table.actions': '操作',
+      'table.edit': '编辑',
+      'table.delete': '删除',
+      'table.empty': '还没有记录。点「新增」开始，或用「导入 CSV」把已有名单带进来。',
+      'table.stale': '需跟进',
+      'form.new': '新增线索',
+      'form.edit': '编辑线索',
+      'form.company': '公司 / 组织',
+      'form.contact': '联系人',
+      'form.channel': '渠道',
+      'form.status': '状态',
+      'form.next': '下一步',
+      'form.note': '备注',
+      'form.save': '保存',
+      'form.cancel': '取消',
+      'channel.email': '邮件',
+      'channel.call': '电话',
+      'channel.linkedin': 'LinkedIn',
+      'channel.other': '其他',
+      'confirm.delete': '确定删除这条记录吗？',
+      'msg.saved': '已保存。',
+      'msg.deleted': '已删除。',
+      'msg.imported': '已导入 {N} 条记录。',
+      'msg.importError': 'CSV 解析失败，请检查列名。',
+      'msg.exported': '已导出 CSV。',
+      'msg.required': '请至少填写公司或联系人。',
+      'footer.text': '数据仅存本浏览器 · 清除浏览器数据会一并删除，重要记录请定期导出 CSV'
+    },
+    en: {
+      'meta.title': 'Relaywork · Outbound tracker',
+      'brand': 'Relaywork',
+      'page.sub': 'Outbound tracker',
+      'nav.back': 'Back to landing page',
+      'nav.lang': 'Switch to Chinese',
+      'nav.theme': 'Light',
+      'notice.title': 'Local only, no outreach on your behalf',
+      'notice.body': 'Everything stays in this browser localStorage. Nothing is uploaded, and this tool does not find contacts, send emails or place calls for you. Do outreach manually, in small volumes, with personalised messages, and comply with CAN-SPAM / GDPR / PECR / TCPA and local rules.',
+      'stats.total': 'Total leads',
+      'stats.stale': 'No follow-up in 7+ days',
+      'status.new': 'Not contacted',
+      'status.contacted': 'Contacted',
+      'status.replied': 'Replied',
+      'status.meeting': 'Meeting booked',
+      'status.won': 'Won',
+      'status.lost': 'Paused',
+      'toolbar.search': 'Search',
+      'toolbar.searchPh': 'Search company, contact or note',
+      'toolbar.all': 'All statuses',
+      'toolbar.add': 'Add lead',
+      'toolbar.import': 'Import CSV',
+      'toolbar.export': 'Export CSV',
+      'table.company': 'Company',
+      'table.contact': 'Contact',
+      'table.channel': 'Channel',
+      'table.status': 'Status',
+      'table.next': 'Next step',
+      'table.updated': 'Updated',
+      'table.actions': 'Actions',
+      'table.edit': 'Edit',
+      'table.delete': 'Delete',
+      'table.empty': 'No records yet. Use Add lead, or bring an existing list in with Import CSV.',
+      'table.stale': 'Follow up',
+      'form.new': 'Add lead',
+      'form.edit': 'Edit lead',
+      'form.company': 'Company',
+      'form.contact': 'Contact',
+      'form.channel': 'Channel',
+      'form.status': 'Status',
+      'form.next': 'Next step',
+      'form.note': 'Note',
+      'form.save': 'Save',
+      'form.cancel': 'Cancel',
+      'channel.email': 'Email',
+      'channel.call': 'Call',
+      'channel.linkedin': 'LinkedIn',
+      'channel.other': 'Other',
+      'confirm.delete': 'Delete this record?',
+      'msg.saved': 'Saved.',
+      'msg.deleted': 'Deleted.',
+      'msg.imported': 'Imported {N} records.',
+      'msg.importError': 'Could not parse the CSV, check the column names.',
+      'msg.exported': 'CSV exported.',
+      'msg.required': 'Enter at least a company or a contact.',
+      'footer.text': 'Stored in this browser only · clearing browser data removes it, export a CSV regularly'
+    }
+  };
+  /* I18N_DICT_END */
+
+  var STORE = 'relaywork-pipeline-v1';
+  var LANG = 'relaywork-pipeline-lang';
+  var THEME = 'relaywork-pipeline-theme';
+  var STATUSES = ['new', 'contacted', 'replied', 'meeting', 'won', 'lost'];
+  var CHANNELS = ['email', 'call', 'linkedin', 'other'];
+  var CSV_COLS = ['company', 'contact', 'channel', 'status', 'nextStep', 'note', 'updatedAt', 'createdAt'];
+
+  var lang = localStorage.getItem(LANG) || 'zh';
+  var rows = [];
+  var editingId = null;
+  var msgTimer = null;
+
+  try {
+    var parsed = JSON.parse(localStorage.getItem(STORE) || '[]');
+    if (Array.isArray(parsed)) rows = parsed;
+  } catch (e) {
+    rows = [];
+  }
+
+  function t(key) { return I18N[lang][key] || I18N.zh[key] || key; }
+  function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  }); }
+  function say(key, n) {
+    var el = document.getElementById('msg');
+    el.textContent = t(key).replace('{N}', n == null ? '' : n);
+    clearTimeout(msgTimer);
+    msgTimer = setTimeout(function () { el.textContent = ''; }, 4000);
+  }
+  function persist() { localStorage.setItem(STORE, JSON.stringify(rows)); }
+
+  function applyLang(next) {
+    lang = next;
+    localStorage.setItem(LANG, lang);
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+    document.title = t('meta.title');
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var v = I18N[lang][el.dataset.i18n];
+      if (v !== undefined) el.textContent = v;
+    });
+    document.querySelectorAll('[data-i18n-ph]').forEach(function (el) {
+      var v = I18N[lang][el.dataset.i18nPh];
+      if (v !== undefined) el.placeholder = v;
+    });
+    document.getElementById('lang-btn').textContent = lang === 'zh' ? 'EN' : '中';
+    document.getElementById('lang-btn').setAttribute('aria-label', t('nav.lang'));
+    document.getElementById('q').setAttribute('aria-label', t('toolbar.search'));
+    fillSelects();
+    render();
+  }
+
+  function fillSelects() {
+    var filter = document.getElementById('filter');
+    var currentFilter = filter.value;
+    filter.innerHTML = '<option value="">' + esc(t('toolbar.all')) + '</option>' +
+      STATUSES.map(function (s) { return '<option value="' + s + '">' + esc(t('status.' + s)) + '</option>'; }).join('');
+    filter.value = currentFilter;
+
+    document.getElementById('f-status').innerHTML = STATUSES.map(function (s) {
+      return '<option value="' + s + '">' + esc(t('status.' + s)) + '</option>';
+    }).join('');
+    document.getElementById('f-channel').innerHTML = CHANNELS.map(function (c) {
+      return '<option value="' + c + '">' + esc(t('channel.' + c)) + '</option>';
+    }).join('');
+  }
+
+  function isStale(r) {
+    if (r.status === 'won' || r.status === 'lost') return false;
+    var days = (Date.now() - new Date(r.updatedAt || 0).getTime()) / 86400000;
+    return days > 7;
+  }
+
+  function visibleRows() {
+    var q = document.getElementById('q').value.trim().toLowerCase();
+    var status = document.getElementById('filter').value;
+    return rows.filter(function (r) {
+      if (status && r.status !== status) return false;
+      if (!q) return true;
+      return [r.company, r.contact, r.note, r.nextStep].join(' ').toLowerCase().indexOf(q) !== -1;
+    }).sort(function (a, b) { return String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')); });
+  }
+
+  function render() {
+    var staleCount = rows.filter(isStale).length;
+    document.getElementById('stats').innerHTML =
+      '<div class="stat"><span>' + esc(t('stats.total')) + '</span><strong>' + rows.length + '</strong></div>' +
+      STATUSES.map(function (s) {
+        return '<div class="stat"><span>' + esc(t('status.' + s)) + '</span><strong>' +
+          rows.filter(function (r) { return r.status === s; }).length + '</strong></div>';
+      }).join('') +
+      '<div class="stat stale"><span>' + esc(t('stats.stale')) + '</span><strong>' + staleCount + '</strong></div>';
+
+    var heads = ['table.company', 'table.contact', 'table.channel', 'table.status', 'table.next', 'table.updated', 'table.actions'];
+    document.getElementById('thead').innerHTML = heads.map(function (k) {
+      return '<th>' + esc(t(k)) + '</th>';
+    }).join('');
+
+    var list = visibleRows();
+    document.getElementById('empty').style.display = list.length ? 'none' : 'block';
+    document.getElementById('tbody').innerHTML = list.map(function (r) {
+      var stale = isStale(r);
+      var cls = 'pill' + (r.status === 'won' ? ' won' : r.status === 'lost' ? ' lost' : '');
+      return '<tr>' +
+        '<td>' + esc(r.company) + '</td>' +
+        '<td>' + esc(r.contact) + '</td>' +
+        '<td>' + esc(t('channel.' + (CHANNELS.indexOf(r.channel) >= 0 ? r.channel : 'other'))) + '</td>' +
+        '<td><span class="' + cls + '">' + esc(t('status.' + (STATUSES.indexOf(r.status) >= 0 ? r.status : 'new'))) + '</span>' +
+          (stale ? ' <span class="pill stale">' + esc(t('table.stale')) + '</span>' : '') + '</td>' +
+        '<td>' + esc(r.nextStep) + '</td>' +
+        '<td>' + esc(String(r.updatedAt || '').slice(0, 10)) + '</td>' +
+        '<td class="row-actions">' +
+          '<button type="button" data-act="edit" data-id="' + esc(r.id) + '">' + esc(t('table.edit')) + '</button> ' +
+          '<button type="button" class="danger" data-act="del" data-id="' + esc(r.id) + '">' + esc(t('table.delete')) + '</button>' +
+        '</td></tr>';
+    }).join('');
+  }
+
+  function openForm(id) {
+    editingId = id || null;
+    var r = id ? rows.find(function (x) { return x.id === id; }) : null;
+    document.getElementById('form-title').textContent = t(r ? 'form.edit' : 'form.new');
+    document.getElementById('f-company').value = r ? r.company || '' : '';
+    document.getElementById('f-contact').value = r ? r.contact || '' : '';
+    document.getElementById('f-channel').value = r && CHANNELS.indexOf(r.channel) >= 0 ? r.channel : 'email';
+    document.getElementById('f-status').value = r && STATUSES.indexOf(r.status) >= 0 ? r.status : 'new';
+    document.getElementById('f-next').value = r ? r.nextStep || '' : '';
+    document.getElementById('f-note').value = r ? r.note || '' : '';
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('f-company').focus();
+  }
+
+  function closeForm() { document.getElementById('overlay').classList.remove('open'); editingId = null; }
+
+  function saveForm() {
+    var company = document.getElementById('f-company').value.trim();
+    var contact = document.getElementById('f-contact').value.trim();
+    if (!company && !contact) { say('msg.required'); return; }
+    var now = new Date().toISOString();
+    var data = {
+      company: company, contact: contact,
+      channel: document.getElementById('f-channel').value,
+      status: document.getElementById('f-status').value,
+      nextStep: document.getElementById('f-next').value.trim(),
+      note: document.getElementById('f-note').value.trim(),
+      updatedAt: now
+    };
+    if (editingId) {
+      var idx = rows.findIndex(function (x) { return x.id === editingId; });
+      if (idx >= 0) rows[idx] = Object.assign({}, rows[idx], data);
+    } else {
+      data.id = 'L' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      data.createdAt = now;
+      rows.push(data);
+    }
+    persist();
+    closeForm();
+    render();
+    say('msg.saved');
+  }
+
+  function parseCsv(text) {
+    var out = [], row = [], cell = '', quoted = false;
+    text = text.replace(/^\uFEFF/, '');
+    for (var i = 0; i < text.length; i++) {
+      var c = text[i];
+      if (quoted) {
+        if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+        else if (c === '"') quoted = false;
+        else cell += c;
+      } else if (c === '"') quoted = true;
+      else if (c === ',') { row.push(cell); cell = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(cell); cell = '';
+        if (row.some(function (v) { return v !== ''; })) out.push(row);
+        row = [];
+      } else cell += c;
+    }
+    row.push(cell);
+    if (row.some(function (v) { return v !== ''; })) out.push(row);
+    if (!out.length) throw new Error('empty');
+    var head = out.shift().map(function (h) { return h.trim(); });
+    if (head.indexOf('company') < 0 && head.indexOf('contact') < 0) throw new Error('columns');
+    return out.map(function (vals) {
+      var o = {};
+      head.forEach(function (h, j) { if (CSV_COLS.indexOf(h) >= 0) o[h] = vals[j] || ''; });
+      return o;
+    });
+  }
+
+  function csvCell(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; }
+
+  function exportCsv() {
+    var csv = [CSV_COLS.join(',')].concat(rows.map(function (r) {
+      return CSV_COLS.map(function (c) { return csvCell(r[c]); }).join(',');
+    })).join('\r\n');
+    var url = URL.createObjectURL(new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' }));
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'relaywork-pipeline.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    say('msg.exported');
+  }
+
+  document.getElementById('lang-btn').addEventListener('click', function () { applyLang(lang === 'zh' ? 'en' : 'zh'); });
+  document.getElementById('theme-btn').addEventListener('click', function () {
+    var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    localStorage.setItem(THEME, next);
+    document.getElementById('theme-btn').textContent = next === 'dark' ? (lang === 'zh' ? '亮色' : 'Light') : (lang === 'zh' ? '暗色' : 'Dark');
+  });
+  document.getElementById('q').addEventListener('input', render);
+  document.getElementById('filter').addEventListener('change', render);
+  document.getElementById('add-btn').addEventListener('click', function () { openForm(null); });
+  document.getElementById('cancel-btn').addEventListener('click', closeForm);
+  document.getElementById('save-btn').addEventListener('click', saveForm);
+  document.getElementById('overlay').addEventListener('click', function (e) { if (e.target === this) closeForm(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeForm(); });
+  document.getElementById('export-btn').addEventListener('click', exportCsv);
+  document.getElementById('import-btn').addEventListener('click', function () { document.getElementById('file').click(); });
+  document.getElementById('file').addEventListener('change', function (e) {
+    var f = e.target.files && e.target.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      try {
+        var items = parseCsv(String(ev.target.result));
+        var now = new Date().toISOString();
+        items.forEach(function (o) {
+          rows.push({
+            id: 'L' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+            company: (o.company || '').slice(0, 120),
+            contact: (o.contact || '').slice(0, 120),
+            channel: CHANNELS.indexOf(o.channel) >= 0 ? o.channel : 'other',
+            status: STATUSES.indexOf(o.status) >= 0 ? o.status : 'new',
+            nextStep: (o.nextStep || '').slice(0, 200),
+            note: (o.note || '').slice(0, 1000),
+            updatedAt: o.updatedAt || now,
+            createdAt: o.createdAt || now
+          });
+        });
+        persist(); render(); say('msg.imported', items.length);
+      } catch (err) { say('msg.importError'); }
+      e.target.value = '';
+    };
+    reader.readAsText(f, 'utf-8');
+  });
+  document.getElementById('tbody').addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-act]');
+    if (!btn) return;
+    var id = btn.dataset.id;
+    if (btn.dataset.act === 'edit') { openForm(id); return; }
+    if (!window.confirm(t('confirm.delete'))) return;
+    rows = rows.filter(function (r) { return r.id !== id; });
+    persist(); render(); say('msg.deleted');
+  });
+
+  var savedTheme = localStorage.getItem(THEME);
+  if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+  else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) document.documentElement.dataset.theme = 'light';
+  document.getElementById('theme-btn').textContent =
+    document.documentElement.dataset.theme === 'dark' ? (lang === 'zh' ? '亮色' : 'Light') : (lang === 'zh' ? '暗色' : 'Dark');
+  applyLang(lang);
+</script>
+</body>
+</html>
