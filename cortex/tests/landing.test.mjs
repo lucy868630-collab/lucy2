@@ -67,3 +67,17 @@ test("隐私说明覆盖确认邮件，且表单上报界面语言", () => {
   assert.ok(html.includes("confirmation"));
   assert.ok(html.includes("lang: currentLang"), "表单需带上界面语言");
 });
+
+test("waitlist 提交不依赖 anon 的 SELECT 权限", () => {
+  const src = read("app/api/waitlist/route.js");
+  assert.ok(!src.includes("resolution=ignore-duplicates"), "该 Prefer 选项会要求 anon 具备 SELECT");
+  assert.ok(src.includes("Prefer: \"return=minimal\""));
+  assert.ok(src.includes("23505"), "重复邮箱需按 409 幂等处理");
+});
+
+test("自检端点把权限拒绝判为健康，只有无效密钥才算错配", () => {
+  const src = read("app/api/waitlist/status/route.js");
+  assert.ok(src.includes("42501"));
+  assert.ok(src.includes('text.includes("Invalid API key")'));
+  assert.ok(!src.includes("res.status === 401 || res.status === 403"));
+});

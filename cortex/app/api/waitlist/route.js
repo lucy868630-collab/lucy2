@@ -35,7 +35,9 @@ export const POST = handle(async (req, { requestId, log }) => {
       "Content-Type": "application/json",
       apikey: config.supabase.anonKey,
       Authorization: "Bearer " + config.supabase.anonKey,
-      Prefer: "return=minimal, resolution=ignore-duplicates",
+      // 不能用 PostgREST 的 resolution / ignore-duplicates 组合：它会触发 SELECT 权限检查，
+      // 而 anon 按设计没有 SELECT，导致所有提交返回 42501。重复邮箱改在下面按 409 幂等处理。
+      Prefer: "return=minimal",
     },
     body: JSON.stringify({
       email,
@@ -46,8 +48,12 @@ export const POST = handle(async (req, { requestId, log }) => {
     }),
   });
 
-  if (!res.ok) {
-    const detail = (await res.text().catch(() => "")).slice(0, 200);
+  const detail = res.ok ? "" : (await res.text().catch(() => "")).slice(0, 200);
+  // email 有 unique 约束：重复提交返回 409/23505，按成功处理（不泄露该邮箱是否已报名）
+  const duplicate = res.status === 409 &&
+    (detail.includes("23505") || detail.includes("duplicate key"));
+
+  if (!res.ok && !duplicate) {
     if (detail.includes("PGRST205")) {
       throw new UpstreamError("候补名单表未就绪", {
         detail: "Supabase 返回 PGRST205：public.waitlist 不存在。请在应用所连接的 Supabase 项目（与 NEXT_PUBLIC_SUPABASE_URL 同一个）的 SQL Editor 执行 waitlist_schema.sql；若在另一个项目里跑过，需切换项目重跑。",
@@ -57,10 +63,14 @@ export const POST = handle(async (req, { requestId, log }) => {
   }
 
   // 只记录邮箱域名，不把完整地址写进日志
-  log.info("waitlist.signup", { domain: email.split("@")[1], request_id: requestId });
+  log.info("waitlist.signup", {
+    domain: email.split("@")[1],
+    duplicate,
+    request_id: requestId,
+  });
 
   // 邮件通道是可选增强：未配置或失败都只返回状态，不影响已完成的入库
   const lang = clean(body?.lang, 8) === "en" ? "en" : "zh";
-  const notification = await sendWaitlistConfirmation({ email, lang, log });
+  const notification = duplicate ? "skipped" : await sendWaitlistConfirmation({ email, lang, log });
   return json({ data: { ok: true, notification } }, { requestId });
 });

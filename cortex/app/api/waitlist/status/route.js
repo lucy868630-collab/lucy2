@@ -86,7 +86,19 @@ export const GET = handle(async (req, { requestId, log }) => {
     });
   }
 
-  if (res.status === 401 || res.status === 403) {
+  // 42501 恰恰说明表存在：anon 只有 insert、没有 select，读被拒是设计结果而非故障。
+  if (text.includes("42501") || text.includes("permission denied for table waitlist")) {
+    return json({
+      ...base,
+      status: "ok",
+      ready: true,
+      table: "present",
+      anon_select: "denied",
+      hint: "public.waitlist 已就绪；anon 只有 insert、没有 select，名单不可被匿名读取。",
+    });
+  }
+
+  if (text.includes("Invalid API key")) {
     return json({
       ...base,
       status: "key_mismatch",

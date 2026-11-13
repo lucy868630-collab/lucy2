@@ -260,6 +260,8 @@ Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态�
 - `/api/ready` 的 `postgres: ok` 只说明 URL 与 anon key 已配置，**不检测 `public.waitlist` 是否存在**。表缺失时 `/api/waitlist` 返回 502，Supabase 原始报错为 `PGRST205: Could not find the table 'public.waitlist' in the schema cache`。
 - 脚本末尾的 `notify pgrst, 'reload schema';` 会立刻刷新 PostgREST schema cache；脚本幂等，可重复执行。
 - 权限设计：`anon` 只有 `insert`、没有 `select`，名单在 Supabase 控制台查看。
+- **别给 `anon` 开 `SELECT`**：`/api/waitlist` 用 `Prefer: return=minimal`，重复邮箱靠 `email` 唯一约束返回的 409/23505 幂等处理。若改用 `resolution=ignore-duplicates`，PostgREST 会额外要求 `SELECT` 权限，所有提交都会变成 `42501 permission denied for table waitlist`。
+- `42501 permission denied for table waitlist` 是**健康状态**（表存在、RLS 生效），`/api/waitlist/status` 会报 `ready: true`；只有 `Invalid API key` 才是密钥与项目不匹配。不要为了消掉 401 去 `grant select`。
 - 部署后打开 `/api/waitlist/status` 自助核对：`ready: true` 表示表已就绪；`table_missing` 表示表未建；`key_mismatch` 表示 URL 与 anon key 不是同一个项目。该端点只读，不返回名单内容，也不返回任何密钥。
 
 ### 落地页分享图
