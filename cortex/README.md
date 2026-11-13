@@ -260,6 +260,11 @@ Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态�
 - `/api/ready` 的 `postgres: ok` 只说明 URL 与 anon key 已配置，**不检测 `public.waitlist` 是否存在**。表缺失时 `/api/waitlist` 返回 502，Supabase 原始报错为 `PGRST205: Could not find the table 'public.waitlist' in the schema cache`。
 - 脚本末尾的 `notify pgrst, 'reload schema';` 会立刻刷新 PostgREST schema cache；脚本幂等，可重复执行。
 - 权限设计：`anon` 只有 `insert`、没有 `select`，名单在 Supabase 控制台查看。
+- 部署后打开 `/api/waitlist/status` 自助核对：`ready: true` 表示表已就绪；`table_missing` 表示表未建；`key_mismatch` 表示 URL 与 anon key 不是同一个项目。该端点只读，不返回名单内容，也不返回任何密钥。
+
+### 落地页分享图
+
+`og:image` / `twitter:image` 指向 1200×630 的 PNG（微信 / X / Facebook 基本不抓 SVG），中英文各一张。改文案后运行 `python cortex/scripts/generate-og.py` 重新生成（依赖 Pillow，字体取自 Windows 系统目录）；仓库里的 SVG 保留作源稿参考。
 
 ### 交付验收清单
 
