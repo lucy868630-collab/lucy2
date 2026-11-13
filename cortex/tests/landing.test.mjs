@@ -36,3 +36,34 @@ test("waitlist 自检端点只读且能区分表缺失与项目错配", () => {
   assert.ok(src.includes("project_ref"));
   assert.ok(!src.includes("method: \"POST\""), "自检不允许写库");
 });
+
+test("集中配置包含可选的邮件与后台配置", () => {
+  const src = read("src/shared/config.js");
+  assert.ok(src.includes("RESEND_API_KEY"));
+  assert.ok(src.includes("WAITLIST_ADMIN_TOKEN"));
+  assert.ok(src.includes("SUPABASE_SERVICE_ROLE_KEY"));
+  assert.ok(!src.includes("NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY"), "service_role 绝不能进浏览器");
+});
+
+test("邮件通知未配置时降级，且不把邮箱写进日志", () => {
+  const src = read("src/shared/notify.js");
+  assert.ok(src.includes('return "skipped"'));
+  assert.ok(src.includes("AbortSignal.timeout"));
+  assert.ok(!src.includes('"waitlist.mail_sent", { email'), "日志不得记录完整邮箱");
+});
+
+test("名单后台凭证缺失时拒绝访问且使用服务端密钥", () => {
+  const src = read("app/api/waitlist/admin/route.js");
+  assert.ok(src.includes("timingSafeEqual"));
+  assert.ok(src.includes("WAITLIST_ADMIN_TOKEN"));
+  assert.ok(src.includes("SUPABASE_SERVICE_ROLE_KEY"));
+  assert.ok(src.includes("rateLimit(req)"), "管理端点必须限流");
+  assert.ok(!src.includes("config.supabase.anonKey"), "名单不能用 anon key 读");
+});
+
+test("隐私说明覆盖确认邮件，且表单上报界面语言", () => {
+  const html = read("public/relaywork.html");
+  assert.ok(html.includes("确认邮件"));
+  assert.ok(html.includes("confirmation"));
+  assert.ok(html.includes("lang: currentLang"), "表单需带上界面语言");
+});

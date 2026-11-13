@@ -254,7 +254,7 @@
     <section id="privacy" class="border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-ink-soft/60">
       <div class="max-w-3xl mx-auto px-5 py-12">
         <h2 class="text-lg font-semibold text-slate-900 dark:text-white" data-i18n="privacy.h2">隐私说明</h2>
-        <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300" data-i18n-html="privacy.p">我们保存你提交的邮箱和选填信息，只用于联系你开放名额。不会出售或共享，也不会用于广告投放。你可以随时发邮件到 <a href="mailto:hello@relaywork.ai" class="text-brand dark:text-brand-light underline">hello@relaywork.ai</a> 查看或删除。正式做付费推广之前，请把这里换成完整隐私政策并补上注册主体地址。</p>
+        <p class="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300" data-i18n-html="privacy.p">我们保存你提交的邮箱和选填信息，只用于联系你开放名额，并发送一封确认邮件（邮件通道不可用时不会发送，不影响报名）。不会出售或共享，也不会用于广告投放。你可以随时发邮件到 <a href="mailto:hello@relaywork.ai" class="text-brand dark:text-brand-light underline">hello@relaywork.ai</a> 查看或删除，也可以直接回复确认邮件要求移除。正式做付费推广之前，请把这里换成完整隐私政策并补上注册主体地址。</p>
       </div>
     </section>
   </main>
@@ -329,7 +329,7 @@
         'faq.q4': '我们的数据怎么处理？', 'faq.a4': '只使用测试流程必需的最少数据，不会用你的数据训练模型，你可以随时撤销访问权限。',
         'faq.q5': '什么时候开始？', 'faq.a5': '首批名额小批量开放，按加入候补名单的顺序联系。',
         'privacy.h2': '隐私说明',
-        'privacy.p': '我们保存你提交的邮箱和选填信息，只用于联系你开放名额。不会出售或共享，也不会用于广告投放。你可以随时发邮件到 <a href="mailto:hello@relaywork.ai" class="text-brand dark:text-brand-light underline">hello@relaywork.ai</a> 查看或删除。正式做付费推广之前，请把这里换成完整隐私政策并补上注册主体地址。',
+        'privacy.p': '我们保存你提交的邮箱和选填信息，只用于联系你开放名额，并发送一封确认邮件（邮件通道不可用时不会发送，不影响报名）。不会出售或共享，也不会用于广告投放。你可以随时发邮件到 <a href="mailto:hello@relaywork.ai" class="text-brand dark:text-brand-light underline">hello@relaywork.ai</a> 查看或删除，也可以直接回复确认邮件要求移除。正式做付费推广之前，请把这里换成完整隐私政策并补上注册主体地址。',
         'footer.tag': 'AI 自动化，替你做完。', 'footer.privacy': '隐私说明', 'footer.what': '我们做什么', 'footer.join': '加入候补名单',
         'footer.copyright': '© <span id="year">2026</span> Relaywork。请替换为你的注册主体名称。',
         'tr.ai': 'AI 翻译整页为', 'tr.btn': '翻译', 'tr.reset': '恢复双语',
@@ -389,7 +389,7 @@
         'faq.q4': 'What happens to our data?', 'faq.a4': 'We work with the minimum data needed to test the workflow. We do not use your data to train models, and you can revoke access at any time.',
         'faq.q5': 'When do you start?', 'faq.a5': 'We are opening the first cohort in small batches. Waitlist members are contacted in the order they joined.',
         'privacy.h2': 'Privacy note',
-        'privacy.p': 'We store the email and optional details you submit so we can contact you about early access. We do not sell or share them, and we do not use them for advertising. Ask us at <a href="mailto:hello@relaywork.ai" class="text-brand dark:text-brand-light underline">hello@relaywork.ai</a> to see or delete your details at any time. Replace this note with a full privacy policy and a registered business address before running paid acquisition.',
+        'privacy.p': 'We store the email and optional details you submit so we can contact you about early access and send you a confirmation email (if the mail channel is unavailable, no email is sent and your signup is unaffected). We do not sell or share them, and we do not use them for advertising. Ask us at <a href="mailto:hello@relaywork.ai" class="text-brand dark:text-brand-light underline">hello@relaywork.ai</a> to see or delete your details at any time, or simply reply to the confirmation email. Replace this note with a full privacy policy and a registered business address before running paid acquisition.',
         'footer.tag': 'AI automation, done for you.', 'footer.privacy': 'Privacy note', 'footer.what': 'What we do', 'footer.join': 'Join the waitlist',
         'footer.copyright': '© <span id="year">2026</span> Relaywork. Replace with your registered entity name.',
         'tr.ai': 'AI translate this page to', 'tr.btn': 'Translate', 'tr.reset': 'Restore',
@@ -601,7 +601,8 @@
               company: String(form.company.value || '').slice(0, 120),
               role: String(form.role.value || '').slice(0, 120),
               note: String(form.note.value || '').slice(0, 1000),
-              source: 'relaywork-landing'
+              source: 'relaywork-landing',
+              lang: currentLang
             })
           });
           if (!res.ok) throw new Error('HTTP ' + res.status);

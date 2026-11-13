@@ -2,6 +2,7 @@ import { rateLimit } from "../../../src/shared/auth.js";
 import { config } from "../../../src/shared/config.js";
 import { UpstreamError, ValidationError } from "../../../src/shared/errors.js";
 import { handle, json } from "../../../src/shared/http.js";
+import { sendWaitlistConfirmation } from "../../../src/shared/notify.js";
 
 export const dynamic = "force-dynamic";
 
@@ -57,5 +58,9 @@ export const POST = handle(async (req, { requestId, log }) => {
 
   // 只记录邮箱域名，不把完整地址写进日志
   log.info("waitlist.signup", { domain: email.split("@")[1], request_id: requestId });
-  return json({ data: { ok: true } }, { requestId });
+
+  // 邮件通道是可选增强：未配置或失败都只返回状态，不影响已完成的入库
+  const lang = clean(body?.lang, 8) === "en" ? "en" : "zh";
+  const notification = await sendWaitlistConfirmation({ email, lang, log });
+  return json({ data: { ok: true, notification } }, { requestId });
 });

@@ -266,6 +266,12 @@ Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态�
 
 `og:image` / `twitter:image` 指向 1200×630 的 PNG（微信 / X / Facebook 基本不抓 SVG），中英文各一张。改文案后运行 `python cortex/scripts/generate-og.py` 重新生成（依赖 Pillow，字体取自 Windows 系统目录）；仓库里的 SVG 保留作源稿参考。
 
+### Waitlist 运营（全部可选，不配置也不影响收名单）
+
+- **确认邮件**：填 `RESEND_API_KEY` + `WAITLIST_MAIL_FROM`（发件域名需在 Resend 验证）后，`POST /api/waitlist` 入库成功会按界面语言发一封事务性确认邮件。未配置、超时或 Resend 拒收都只返回 `notification: "skipped" / "failed"`，**不会让报名失败**；日志只记邮箱域名与状态，不记完整地址。可用 `WAITLIST_CONFIRM_ENABLED=false` 显式关闭。
+- **名单后台**：`GET /api/waitlist/admin`（`Authorization: Bearer <WAITLIST_ADMIN_TOKEN>`）读取名单，管理页在 `/waitlist-admin`。`WAITLIST_ADMIN_TOKEN` 与 `SUPABASE_SERVICE_ROLE_KEY` **两项都填**才启用，缺任一项直接拒绝，绝不回退到匿名读取；凭证用常量时间比较并受限流保护，token 只存在浏览器 `sessionStorage`。service_role 是高权限密钥，只放服务端环境变量，绝不加 `NEXT_PUBLIC_` 前缀。
+- **不配置也能用**：名单始终可在 Supabase 控制台查看，管理页会明确提示未配置，而不是假装成功。
+
 ### 交付验收清单
 
 - [x] `npm run build` 通过，无报错

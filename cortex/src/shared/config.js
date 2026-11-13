@@ -11,6 +11,10 @@ const supabaseKey = read("NEXT_PUBLIC_SUPABASE_ANON_KEY");
 const deepseekKey = read("DEEPSEEK_API_KEY");
 const openaiKey = read("OPENAI_API_KEY");
 const hfToken = read("HF_API_TOKEN");
+const resendKey = read("RESEND_API_KEY");
+const mailFrom = read("WAITLIST_MAIL_FROM");
+const adminToken = read("WAITLIST_ADMIN_TOKEN");
+const serviceKey = read("SUPABASE_SERVICE_ROLE_KEY");
 
 export const config = {
   app: {
@@ -52,6 +56,19 @@ export const config = {
   },
   api: {
     baseUrl: read("NEXT_PUBLIC_API_URL", "http://localhost:3000"),
+  },
+  mail: {
+    resendKey,
+    from: mailFrom,
+    replyTo: read("WAITLIST_REPLY_TO"),
+    enabled: read("WAITLIST_CONFIRM_ENABLED", "true").toLowerCase() === "true",
+    timeoutMs: int("MAIL_TIMEOUT_MS", 5000),
+    configured: Boolean(resendKey && mailFrom),
+  },
+  admin: {
+    token: adminToken,
+    serviceKey,
+    maxRows: int("WAITLIST_ADMIN_MAX_ROWS", 200),
   },
   observability: {
     logLevel: read("LOG_LEVEL", "info"),
