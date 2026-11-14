@@ -495,6 +495,7 @@ export default function DashboardPage() {
         <div className="nav-item" onClick={() => nav("sec-report")}>✦ {t.navReport}</div>
         <div className="nav-group">{t.groupWorkspace}</div>
         <div className="nav-item" onClick={() => nav("sec-upload")}>↥ {t.navUpload}</div>
+        <div className="nav-item" onClick={() => { window.location.href = "/ml-studio.html"; }}>◈ {t.mlStudioNav}</div>
         <div className="side-foot">
           <div className="avatar">{(user?.email || "D")[0].toUpperCase()}</div>
           <div className="side-user"><span>{user?.email || t.demoMode}</span><small>{supabaseConfigured ? t.sourceAccount : t.demoMode}</small></div>
