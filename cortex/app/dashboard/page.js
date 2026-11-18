@@ -8,6 +8,7 @@ import { T } from "../../lib/i18n";
 import { buildSmartView } from "../../lib/smart";
 import { normDate } from "../../lib/date";
 import ChurnPanel from "./ChurnPanel";
+import DashboardDesignPanel from "./DashboardDesignPanel";
 import { supabase, supabaseConfigured } from "../../lib/supabaseClient";
 
 const SAMPLE_AGG = {
@@ -110,6 +111,7 @@ export default function DashboardPage() {
   const [mapSel, setMapSel] = useState({});
   const [smart, setSmart] = useState(null);       // AI 数据画像 + 动态视图
   const [rawRows, setRawRows] = useState(null);   // 当前账户原始订单行，供流失风险计算
+  const [refreshedAt, setRefreshedAt] = useState(null);
   const [profileBusy, setProfileBusy] = useState(false);
   const [busyUpload, setBusyUpload] = useState(false);
   const [report, setReport] = useState("");
@@ -136,6 +138,7 @@ export default function DashboardPage() {
           setSmart(view);
           setAgg(view.agg);
           setRawRows(saved.rows);
+          setRefreshedAt(new Date().toLocaleString(lang === "en" ? "en-NZ" : "zh-CN"));
         }
       } catch {}
     };
@@ -161,6 +164,7 @@ export default function DashboardPage() {
       a.meta = { rows: data.length, customers: new Set(data.map((r) => r.customer_id)).size };
       setAgg(a);
       setRawRows(data);
+      setRefreshedAt(new Date().toLocaleString(lang === "en" ? "en-NZ" : "zh-CN"));
     }
   }
 
@@ -333,6 +337,7 @@ export default function DashboardPage() {
         const view = buildSmartView(rows, j.profile);
         setSmart(view);
         setAgg(view.agg);
+        setRefreshedAt(new Date().toLocaleString(lang === "en" ? "en-NZ" : "zh-CN"));
         try { localStorage.setItem("cortex_dataset", JSON.stringify({ rows: rows.slice(0, 5000), fields, profile: j.profile, fileName })); } catch {}
       }
     } catch {} finally { setProfileBusy(false); }
@@ -343,6 +348,7 @@ export default function DashboardPage() {
     setSmart(null);
     setAgg(SAMPLE_AGG);
     setRawRows(null);
+    setRefreshedAt(null);
     if (user) loadOrders(user.id);
   }
 
@@ -491,6 +497,7 @@ export default function DashboardPage() {
         <div className="side-brand"><div className="logo-dot"></div><div><b>{t.brand}</b><small>{t.brandSub}</small></div></div>
         <div className="nav-group">{t.groupData}</div>
         <div className="nav-item active" onClick={() => nav("sec-top")}>◼ {t.navOverview}</div>
+        <div className="nav-item" onClick={() => nav("sec-design")}>▤ {t.designNav}</div>
         <div className="nav-item" onClick={() => nav("sec-churn")}>◈ {t.churnNav}</div>
         <div className="nav-item" onClick={() => nav("sec-report")}>✦ {t.navReport}</div>
         <div className="nav-group">{t.groupWorkspace}</div>
@@ -612,6 +619,14 @@ export default function DashboardPage() {
             </>
           )}
         </div>
+
+        <DashboardDesignPanel
+          agg={agg}
+          lang={lang}
+          range={range}
+          refreshedAt={refreshedAt}
+          sourceLabel={smart ? t.smartSource || t.navUpload : supabaseConfigured && user ? t.sourceAccount : t.sourceSample}
+        />
 
         <ChurnPanel rawRows={rawRows} lang={lang} t={t} />
 
