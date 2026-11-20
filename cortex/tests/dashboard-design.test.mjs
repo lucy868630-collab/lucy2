@@ -141,6 +141,17 @@ test("面板已接入工作台导航、KPI 区之后，并传入数据来源与�
   assert.ok(!/fetch\s*\(|XMLHttpRequest|sendBeacon/.test(panel), "设计评审不得上传数据");
 });
 
+test("工作台仪表按 iOS HIG 提供触控目标、无障碍标签、进度指示与减弱动态效果", () => {
+  const css = readFileSync(join(root, "app/globals.css"), "utf8");
+  assert.ok(css.includes("min-height:44px"), "缺少 44pt 最小触控目标");
+  assert.ok(css.includes("prefers-reduced-motion"), "未尊重 Reduce Motion 偏好");
+  assert.ok(css.includes(":focus-visible"), "缺少可见焦点环");
+  assert.ok(css.includes(".kpi-meter"), "缺少 KPI 进度指示样式");
+  assert.ok(page.includes('role="progressbar"') && page.includes('aria-valuenow='), "KPI 缺少进度条语义");
+  assert.ok(page.includes('role="link"') && page.includes("tabIndex={0}"), "导航缺少键盘可达性");
+  assert.ok(page.includes('aria-label={t.navOverview}'), "导航缺少无障碍标签");
+});
+
 test("README 记录课件来源、演示阈值边界与导出说明，不依赖本机课件文件", () => {
   assert.ok(readme.includes("MBIC 807 Week 12"));
   assert.ok(readme.includes("slides.pptx") && readme.includes("lecture-notes.docx") && readme.includes("dashboards-paper.pdf"));

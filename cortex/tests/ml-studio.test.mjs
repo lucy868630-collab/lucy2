@@ -33,7 +33,7 @@ function loadApi() {
   };
   const ctx = vm.createContext(sandbox);
   vm.runInContext(
-    script + "\n;globalThis.__api = { S, sampleRetail, sampleIris, initSelection, buildMatrix, cleanRows, kmeans, elbow, linreg, decisionTree, parseFileText, parseCsv, parseArff };",
+    script + "\n;globalThis.__api = { S, sampleRetail, sampleIris, initSelection, buildMatrix, cleanRows, kmeans, elbow, linreg, decisionTree, parseFileText, parseCsv, parseArff, wekaAttrDecl, treeSvg };",
     ctx
   );
   return ctx.__api;
@@ -159,4 +159,23 @@ test("花卉示例同样可跑，且两个示例是确定性生成的", () => {
   assert.equal(M.X.length, 150);
   const km = api.kmeans(M.X, 3);
   assert.equal(km.assign.length, 150);
+});
+
+test("Weka 互通：ARFF 属性声明、算法对照与决策树结构图", () => {
+  for (const key of ["nav.weka", "weka.title", "weka.exportArff", "weka.mapTitle", "weka.license", "weka.treeTitle"]) {
+    assert.ok(dict.includes(`'${key}'`), `缺少 Weka 字典键 ${key}`);
+  }
+  assert.ok(html.includes("data-act=\"weka\"") && html.includes("data-act=\"export-arff\""));
+  assert.ok(html.includes("SimpleKMeans") && html.includes("J48") && html.includes("LinearRegression"));
+  assert.ok(html.includes("GPLv3") && html.includes("ARFF"), "必须写明授权边界与互通格式");
+  assert.ok(!html.includes("weka.jar") && !html.includes("weka.classifiers"), "不得打包 Weka 代码");
+  const api = loadApi();
+  api.S.dataset = api.sampleIris();
+  api.S.dataset.cols.forEach((c, i) => { c.__index = i; });
+  assert.equal(api.wekaAttrDecl(api.S.dataset.cols[0]), "numeric");
+  assert.ok(api.wekaAttrDecl(api.S.dataset.cols[4]).startsWith("{setosa,"));
+  const svg = api.treeSvg({ leaf: true, label: "setosa", n: 50 }, 1);
+  assert.ok(svg.includes("setosa") && svg.includes("n=50") && svg.includes("margin-left:18px"));
+  const branch = api.treeSvg({ leaf: false, feature: "PetalLength", threshold: 2.5, left: { leaf: true, label: "setosa", n: 50 }, right: { leaf: true, label: "virginica", n: 50 } }, 0);
+  assert.ok(branch.includes("PetalLength") && branch.includes("tree-node") && branch.includes("tree-leaf"));
 });

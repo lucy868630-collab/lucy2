@@ -44,6 +44,15 @@ body{background:var(--bg);color:var(--text);min-height:100vh}
 .kpi .label{font-size:12px;color:var(--muted);margin-bottom:8px}
 .kpi .value{font-size:24px;font-weight:700}
 .kpi .delta{font-size:12px;margin-top:6px;color:var(--green)}
+.kpi-meter{height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:12px;overflow:hidden}
+.kpi-meter i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .3s ease}
+
+/* iOS HIG: 44pt 最小触控目标、语义焦点环、减弱动态效果 */
+.nav-item,.mode-tabs span,.seg span,.lang-switch span,.btn,.icon-btn{min-height:44px}
+.nav-item:focus-visible,.mode-tabs span:focus-visible,.seg span:focus-visible,.lang-switch span:focus-visible,.btn:focus-visible,.design-tab:focus-visible,.design-chart-item:focus-visible,.design-level1:focus-visible,.design-check-list label:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+}
 
 .cards{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
 .cards-even{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}

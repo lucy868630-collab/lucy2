@@ -495,14 +495,14 @@ export default function DashboardPage() {
     <div className="app-shell" translate="no">
       <aside className="sidebar">
         <div className="side-brand"><div className="logo-dot"></div><div><b>{t.brand}</b><small>{t.brandSub}</small></div></div>
-        <div className="nav-group">{t.groupData}</div>
-        <div className="nav-item active" onClick={() => nav("sec-top")}>◼ {t.navOverview}</div>
-        <div className="nav-item" onClick={() => nav("sec-design")}>▤ {t.designNav}</div>
-        <div className="nav-item" onClick={() => nav("sec-churn")}>◈ {t.churnNav}</div>
-        <div className="nav-item" onClick={() => nav("sec-report")}>✦ {t.navReport}</div>
-        <div className="nav-group">{t.groupWorkspace}</div>
-        <div className="nav-item" onClick={() => nav("sec-upload")}>↥ {t.navUpload}</div>
-        <div className="nav-item" onClick={() => { window.location.href = "/ml-studio.html"; }}>◈ {t.mlStudioNav}</div>
+        <div className="nav-group" role="presentation">{t.groupData}</div>
+        <div className="nav-item active" role="link" tabIndex={0} aria-label={t.navOverview} onClick={() => nav("sec-top")} onKeyDown={(e) => e.key === "Enter" && nav("sec-top")}>◼ {t.navOverview}</div>
+        <div className="nav-item" role="link" tabIndex={0} aria-label={t.designNav} onClick={() => nav("sec-design")} onKeyDown={(e) => e.key === "Enter" && nav("sec-design")}>▤ {t.designNav}</div>
+        <div className="nav-item" role="link" tabIndex={0} aria-label={t.churnNav} onClick={() => nav("sec-churn")} onKeyDown={(e) => e.key === "Enter" && nav("sec-churn")}>◈ {t.churnNav}</div>
+        <div className="nav-item" role="link" tabIndex={0} aria-label={t.navReport} onClick={() => nav("sec-report")} onKeyDown={(e) => e.key === "Enter" && nav("sec-report")}>✦ {t.navReport}</div>
+        <div className="nav-group" role="presentation">{t.groupWorkspace}</div>
+        <div className="nav-item" role="link" tabIndex={0} aria-label={t.navUpload} onClick={() => nav("sec-upload")} onKeyDown={(e) => e.key === "Enter" && nav("sec-upload")}>↥ {t.navUpload}</div>
+        <div className="nav-item" role="link" tabIndex={0} aria-label={t.mlStudioNav} onClick={() => { window.location.href = "/ml-studio.html"; }} onKeyDown={(e) => e.key === "Enter" && (window.location.href = "/ml-studio.html")}>◈ {t.mlStudioNav}</div>
         <div className="side-foot">
           <div className="avatar">{(user?.email || "D")[0].toUpperCase()}</div>
           <div className="side-user"><span>{user?.email || t.demoMode}</span><small>{supabaseConfigured ? t.sourceAccount : t.demoMode}</small></div>
@@ -612,10 +612,10 @@ export default function DashboardPage() {
             </div>
           )) : (
             <>
-              <div className="kpi"><div className="label">{t.rev}</div><div className="value money">{fmt(rev)}</div><div className="delta">{t.kpiRevSub}</div></div>
-              <div className="kpi"><div className="label">{t.prof}</div><div className="value money">{fmt(prof)}</div><div className="delta">{tr(t.kpiProfSub, { V: pct(prof, rev) })}</div></div>
-              <div className="kpi"><div className="label">{t.orders}</div><div className="value">{ord}</div><div className="delta">{tr(t.kpiOrdersSub, { V: agg.meta.customers })}</div></div>
-              <div className="kpi"><div className="label">{t.units}</div><div className="value">{units}</div><div className="delta">{tr(t.kpiUnitsSub, { A: agg.category.length, B: agg.region.length })}</div></div>
+              <div className="kpi" role="group" aria-label={`${t.rev} ${fmt(rev)}`}><div className="label">{t.rev}</div><div className="value money">{fmt(rev)}</div><div className="delta">{t.kpiRevSub}</div><div className="kpi-meter" role="progressbar" aria-valuenow={rev} aria-valuemin={0} aria-valuemax={maxTop * 10 || rev || 1}><i style={{ width: Math.min(100, (rev / (maxTop * 10 || rev || 1)) * 100) + "%" }}></i></div></div>
+              <div className="kpi" role="group" aria-label={`${t.prof} ${fmt(prof)}`}><div className="label">{t.prof}</div><div className="value money">{fmt(prof)}</div><div className="delta">{tr(t.kpiProfSub, { V: pct(prof, rev) })}</div><div className="kpi-meter" role="progressbar" aria-valuenow={pct(prof, rev)} aria-valuemin={0} aria-valuemax={100}><i style={{ width: Math.max(0, Math.min(100, pct(prof, rev))) + "%" }}></i></div></div>
+              <div className="kpi" role="group" aria-label={`${t.orders} ${ord}`}><div className="label">{t.orders}</div><div className="value">{ord}</div><div className="delta">{tr(t.kpiOrdersSub, { V: agg.meta.customers })}</div><div className="kpi-meter" role="progressbar" aria-valuenow={ord} aria-valuemin={0} aria-valuemax={ord + agg.meta.customers || 1}><i style={{ width: Math.min(100, (ord / (ord + agg.meta.customers || 1)) * 100) + "%" }}></i></div></div>
+              <div className="kpi" role="group" aria-label={`${t.units} ${units}`}><div className="label">{t.units}</div><div className="value">{units}</div><div className="delta">{tr(t.kpiUnitsSub, { A: agg.category.length, B: agg.region.length })}</div><div className="kpi-meter" role="progressbar" aria-valuenow={agg.category.length} aria-valuemin={0} aria-valuemax={agg.category.length + agg.region.length || 1}><i style={{ width: Math.min(100, (agg.category.length / (agg.category.length + agg.region.length || 1)) * 100) + "%" }}></i></div></div>
             </>
           )}
         </div>

@@ -285,6 +285,16 @@ Next.js 带服务端 API 路由，**不能**部署到 GitHub Pages 等纯静态�
 - **方案取舍**：等价于需求里「方案 B 自动刷新」的轻量实现，省去结果表的 DDL，因此不依赖 SQL Editor；也保留了方案 A 的可复现离线计算思路（`computeChurn` 是纯函数，可直接导成 CSV）。若要模型 API（方案 C），可在 `services/ai` 加预测端点替换 `computeChurn`。
 - 回答「准确率不够怎么办」：分数只作参考，最终结合人工判断；功能是提前发现趋势和提醒关注，不是替代决策。
 
+### 工作台仪表与 iOS 设计规范
+
+`/dashboard` 的 KPI 卡与导航按 Apple Human Interface Guidelines 做了一轮无障碍改造：44pt 最小触控目标、`:focus-visible` 焦点环、语义化 `role="link"` + `tabIndex` + `aria-label`、KPI 进度条用 `role="progressbar"` 暴露 `aria-valuenow/min/max`、`prefers-reduced-motion` 下关闭装饰动画。颜色仍配文字或图标，不靠单一色相传递状态（与 Week 12 课件一致）。参考 `iOS 应用开发` 技能的 Layout / Accessibility / Colors 清单。
+
+### Weka 互通（ARFF 数据格式）
+
+`/ml-studio.html` 左侧「Weka 互通」提供三件事：① 一键把当前数据集导出为 ARFF（`@relation` / `@attribute` / `@data`，缺失值写 `?`），可在 Weka Explorer 的 Open file 直接打开；② 本页算法 ↔ Weka 算法对照（K-Means ↔ SimpleKMeans、线性回归 ↔ LinearRegression、决策树 ↔ J48 / REPTree、预处理 ↔ ReplaceMissingValues / RemoveDuplicates / Normalize）；③ 决策树结果用 Weka 风格树形结构展示。
+
+**授权边界**：Weka 是 GPLv3 的 Java 桌面软件，本平台是 MIT。只交换 ARFF 这种开放数据格式，不打包、不分发 Weka 的 Java 代码；Weka 由用户按 GPLv3 自行安装。
+
 ### 仪表板设计评审（MBIC 807 Week 12）
 
 `/dashboard` 左侧「仪表板设计评审」进入（锚点 `sec-design`）。这部分把 `courses/MBIC 807/Week 12` 的 `slides.pptx`（p.19–34）、`lecture-notes.docx`（§4–19）与 `dashboards-paper.pdf`（p.1–2 / §3）转成可操作、可导出的评审模块，不是把课件原文贴进页面：

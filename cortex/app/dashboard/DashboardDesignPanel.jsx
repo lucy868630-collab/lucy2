@@ -87,7 +87,7 @@ export default function DashboardDesignPanel({ agg, lang, range, refreshedAt, so
 
       <div className="design-tabs">
         {TABS.map(([id, key]) => (
-          <button key={id} type="button" className={"design-tab" + (tab === id ? " on" : "")}
+          <button key={id} type="button" aria-pressed={tab === id} className={"design-tab" + (tab === id ? " on" : "")}
             onClick={() => setTab(id)}>{dt(lang, key)}</button>
         ))}
       </div>
@@ -173,7 +173,7 @@ export default function DashboardDesignPanel({ agg, lang, range, refreshedAt, so
             <p className="design-desc">{dt(lang, "chartDesc")}</p>
             <div className="design-chart-list">
               {CHART_RULES.map((r) => (
-                <button type="button" key={r.id} className={"design-chart-item" + (r.id === chartId ? " on" : "")} onClick={() => setChartId(r.id)}>
+                <button type="button" key={r.id} aria-pressed={r.id === chartId} className={"design-chart-item" + (r.id === chartId ? " on" : "")} onClick={() => setChartId(r.id)}>
                   <span>{r.q[lang]}</span><small>{r.use[lang]}</small>
                 </button>
               ))}
@@ -196,7 +196,7 @@ export default function DashboardDesignPanel({ agg, lang, range, refreshedAt, so
               <div className="card-head"><h3>{dt(lang, "level1")}</h3><span>{dt(lang, "source")}: 课件 p.31 / 讲义 §14</span></div>
               <div className="design-level1-list">
                 {tiles.map((k) => (
-                  <button type="button" key={k.id} className={"design-level1" + (kpiId === k.id ? " on" : "")} onClick={() => setKpiId(k.id)}>
+                  <button type="button" key={k.id} aria-pressed={kpiId === k.id} className={"design-level1" + (kpiId === k.id ? " on" : "")} onClick={() => setKpiId(k.id)}>
                     <span>{k.name[lang]}</span><b>{k.valueLabel}</b><em className={"design-status " + k.status.key}>{k.status.icon} {dt(lang, k.status.text)}</em>
                   </button>
                 ))}
